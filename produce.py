@@ -4,7 +4,7 @@ from os.path import basename, splitext
 from shutil import move
 from subprocess import run
 start = time.time()
-magick = "" if os.name != "nt" else "magick"
+magick = "" if os.name != "nt" else "magick "
 for f in glob.glob("./*[0-9].kra"):
     baseName = (splitext(basename(f))[0])
     zipfile.ZipFile(f, "r").extract("mergedimage.png")
