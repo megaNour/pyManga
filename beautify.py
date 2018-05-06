@@ -7,10 +7,10 @@ from pathlib import Path
 
 manager = Manager("..")
 for path in glob.glob("*.png") + glob.glob("*.jpg"):
-    p = re.compile(".+-(\d+)\.(\w+)$")
+    p = re.compile("[^0-9]+(\d+)\.(\w+)$")
     path = os.path.basename(path)
     m = p.search(path)
     if m:
-        shutil.move(path, manager.getPageName(int(m.group(1))+1, m.group(2)))
+       shutil.move(path, manager.getPageName(int(m.group(1)), m.group(2)))
 
                 

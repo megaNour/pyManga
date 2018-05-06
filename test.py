@@ -1,6 +1,8 @@
+import os
+import glob
 from manager import Manager
-help(Manager)
-manager = Manager()
+manager = Manager("..")
 
-print(manager.__dict__.keys())
+f = glob.glob("./*.pdf")
+os.remove(f[0])
 

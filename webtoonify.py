@@ -15,8 +15,6 @@ manager = Manager("..")
 
 
 f = glob.glob("./*.pdf")
-if f:
-    print(f)
 
 fileName = splitext(basename(f[0]))[0]
 
@@ -25,9 +23,9 @@ for file in glob.glob("*.jpg") : os.remove(file)
 os.chdir("../scribus")
 
 magick = "" if os.name != "nt" else "magick "
-run(magick + "convert -density 300 -crop 3036x4725+236+236 -resize 800 " + f[0] + " ../release/" + fileName + ".jpg")
+run(magick + "convert -density 300 -scene 1 -crop 3036x4725+236+236 -resize 800 " + f[0] + " ../release/" + fileName + ".jpg")
 
-os.remove(f)
+#os.remove(f[0])
 
 os.chdir("../release")
 import beautify
