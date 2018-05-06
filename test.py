@@ -1,3 +1,6 @@
-for x in range(1, 14 + 1):
-    print(x)
-print(x++)
+from manager import Manager
+help(Manager)
+manager = Manager()
+
+print(manager.__dict__.keys())
+

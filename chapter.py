@@ -7,6 +7,7 @@ import shutil
 from pathlib import Path
 
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", help="chapter title ?")
 parser.add_argument("-n", type=int, help="number of pages ?")
@@ -56,5 +57,5 @@ writeFile = open("./" + chapterName + "/scribus/" + chapterName + ".sla", "w")
 writeFile.write(content)
 writeFile.close()
 
-print(content)
+#print(content)
 #shutil.copyfile("./generic/scribus/generic.sla", "./" + chapterName + "/scribus/" + chapterName + ".sla")   

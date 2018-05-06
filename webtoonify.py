@@ -5,47 +5,33 @@ import os
 import time
 import sys
 import re
+from manager import Manager
 from os.path import basename, splitext
 import shutil
 from subprocess import run
 start = time.time()
 
-def produceFile(filePath):
-    baseName = (splitext(basename(filePath))[0])
-    print(baseName + " ### Production")
-    zipfile.ZipFile(filePath, "r").extract("mergedimage.png")
-    #run([magick, "convert", "-resize", "800", "-density", "300", "mergedimage.png", "../jpg/" + baseName + ".jpg"], shell=True)
-    run(magick + "convert -resize 800 -density 300 mergedimage.png ../jpg/" + baseName + ".jpg", shell=True)
-    print("JPG => OK")
-    shutil.move("mergedimage.png", "../png/" + baseName + ".png")
-    print("PNG => OK")
+manager = Manager("..")
 
-def findAndProduce(fileIndex):
-    f = glob.glob("./*_p" + fileIndex.zfill(2) + ".kra")
-    if f:
-        print(f)
-        produceFile(f[0])
 
-os.makedirs("../jpg/", exist_ok=True)
-os.makedirs("../png/", exist_ok=True)
+f = glob.glob("./*.pdf")
+if f:
+    print(f)
+
+fileName = splitext(basename(f[0]))[0]
+
+os.chdir("../release")
+for file in glob.glob("*.jpg") : os.remove(file)
+os.chdir("../scribus")
+
 magick = "" if os.name != "nt" else "magick "
+run(magick + "convert -density 300 -crop 3036x4725+236+236 -resize 800 " + f[0] + " ../release/" + fileName + ".jpg")
 
-#Batch <= because no specific file indicated
-if len(sys.argv) == 1 :
-    print(sys.argv)
-    print(len(sys.argv))
-    for f in glob.glob("./*[0-9].kra"):
-        print(f)
-        produceFile(f)
-else:
-    for s in sys.argv[1:len(sys.argv)]:
-        if("-" not in s):
-            findAndProduce(s)
-        else:
-            split = s.split("-")
-            for i in range(int(split[0]), int(split[1])+1):
-                findAndProduce(str(i))
-                
+os.remove(f)
+
+os.chdir("../release")
+import beautify
+
 print("time taken: %.2f " % (time.time() - start))
 
 
