@@ -1,5 +1,6 @@
 import re
 import os
+from os.path import basename
 from pathlib import Path
 class Manager:
     """a class to infer useful info:
@@ -22,3 +23,10 @@ class Manager:
         pageNum = str(pageNum).zfill(2)
         return self.seriesName + "_c" + self.chapNum + "_p" + pageNum + "." + extention
 
+    def getChapterName(self):
+        return self.seriesName + "_c" + self.chapNum
+
+    def getPageNumber(self, path):
+        p = re.compile("_p(\d+)\.\w+$")
+        m = p.search(basename(path))
+        return int(m.group(1))

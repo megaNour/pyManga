@@ -5,12 +5,13 @@ import shutil
 from manager import Manager
 from pathlib import Path
 
-manager = Manager("..")
-for path in glob.glob("*.png") + glob.glob("*.jpg"):
-    p = re.compile("[^0-9]+(\d+)\.(\w+)$")
-    path = os.path.basename(path)
-    m = p.search(path)
-    if m:
-       shutil.move(path, manager.getPageName(int(m.group(1)), m.group(2)))
+def beautify():
+    manager = Manager("..")
+    for path in glob.glob("*[0-9].png") + glob.glob("*[0-9].jpg"):
+        p = re.compile("\W(\d+)\.(\w+)$")
+        path = os.path.basename(path)
+        m = p.search(path)
+        if m:
+           shutil.move(path, manager.getPageName(int(m.group(1)), m.group(2)))
 
-                
+beautify()                

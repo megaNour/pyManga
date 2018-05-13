@@ -1,8 +1,10 @@
 import os
 import glob
 from manager import Manager
-manager = Manager("..")
+from pathlib import Path
+#manager = Manager("..")
 
-f = glob.glob("./*.pdf")
-os.remove(f[0])
+import importMe
+from importMe import importMe
+importMe()
 
