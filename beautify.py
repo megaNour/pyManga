@@ -8,7 +8,7 @@ from pathlib import Path
 def beautify():
     manager = Manager("..")
     for path in glob.glob("*[0-9].png") + glob.glob("*[0-9].jpg"):
-        p = re.compile("\W(\d+)\.(\w+)$")
+        p = re.compile("\D(\d+)\.(\w+)$")
         path = os.path.basename(path)
         m = p.search(path)
         if m:
