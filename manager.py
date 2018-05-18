@@ -17,7 +17,7 @@ class Manager:
         os.chdir(chapDir)
         self.seriesName = Path.cwd().parent.parent.name
         self.chapNum, self.chapTitle = self.getChapterNumber(Path.cwd().name)
-        os.chdir(previousDir)
+        os.chdir(str(previousDir))
 
     def getPageName(self, pageNum, extention):
         pageNum = str(pageNum).zfill(2)

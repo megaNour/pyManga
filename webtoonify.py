@@ -34,16 +34,16 @@ for file in glob.glob("*.jpg") : os.remove(file)
 os.chdir("../scribus")
 
 magick = "" if os.name != "nt" else "magick "
-run(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " + f[0] + " ../release/" + fileName + ".png")
+run(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " + os.path.abspath(f[0]) + " ../release/" + fileName + ".png", shell=True)
 #-crop 3036x4725+236+236 
-os.remove(f[0])
+#os.remove(f[0])
 
 os.chdir("../release")
 #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
 genericPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
 footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
 
-shutil.copyfile(genericPath, "margin.png")
+shutil.copyfile(str(genericPath), "margin.png")
 
 footer = " "
 extra = " "
@@ -54,18 +54,18 @@ if footerPath.exists():
 
 beautify()
 
-command = magick + "convert -append "
+command = magick + "convert -colorspace sRGB -append "
 
 
 for path in glob.glob("*[0-9].png"):
         foot = footer if manager.getPageNumber(path) > 0 else " "
-        run(magick + "convert" + extra + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
+        run(magick + "convert" + extra + basename(path) + foot + splitext(basename(path))[0] + ".jpg", shell=True)
         command += basename(path) + " margin.png "
         
 command = re.sub("margin.png $", "", command)
 command += footer + manager.getChapterName() + ".jpg"
 print(command)
-run(command)
+run(command, shell=True)
 
 for path in glob.glob("*.png"): os.remove(path)
 
