@@ -36,7 +36,7 @@ os.chdir("../scribus")
 magick = "" if os.name != "nt" else "magick "
 run(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " + os.path.abspath(f[0]) + " ../release/" + fileName + ".png", shell=True)
 #-crop 3036x4725+236+236 
-#os.remove(f[0])
+os.remove(f[0])
 
 os.chdir("../release")
 #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
