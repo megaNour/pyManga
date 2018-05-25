@@ -2,9 +2,10 @@ import os
 import glob
 from manager import Manager
 from pathlib import Path
-#manager = Manager("..")
+manager = Manager("..")
 
-import importMe
-from importMe import importMe
-importMe()
+for path in glob.glob("*[0-9].png"):
+		foot = "yes" if manager.getPageNumber(path) > 0 else "no"
+		print(path + " " + foot)
+
 

@@ -31,13 +31,13 @@ f = glob.glob("./*.pdf")
 fileName = splitext(basename(f[0]))[0]
 
 os.chdir("../release")
-for file in glob.glob("*.jpg") : os.remove(file)
+for file in glob.glob("*") : os.remove(file)
 os.chdir("../scribus")
 
 magick = "" if os.name != "nt" else "magick "
 run(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " + os.path.abspath(f[0]) + " ../release/" + fileName + ".png", shell=True)
 #-crop 3036x4725+236+236 
-#os.remove(f[0])
+os.remove(f[0])
 
 os.chdir("../release")
 #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
@@ -51,7 +51,7 @@ footer = " "
 append = " "
 if args.m is not None:
 	margin = " " + marginName + " "
-	shutil.copyfile(str(marginPath), margin)
+	shutil.copyfile(str(marginPath), marginName)
 if args.f is not None:
 		footer = " " + footerName + " "
 		shutil.copyfile(footerPath, footer.strip())
@@ -63,9 +63,11 @@ command = magick + "convert -colorspace sRGB -append "
 
 
 for path in glob.glob("*[0-9].png"):
-        foot = footer if manager.getPageNumber(path) > 0 else " "
-        run(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg", shell=True)
-        command += basename(path) + margin
+		foot, marge = footer, margin
+		if not manager.getPageNumber(path) > 0:
+				foot = marge = " "
+		run(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg", shell=True)
+		command += basename(path) + marge
         
 command = re.sub(margin + "$", "", command)
 command = re.sub("  +", " ", command)
