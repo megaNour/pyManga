@@ -49,10 +49,10 @@ footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / foote
 margin = " "
 footer = " "
 append = " "
-if args.m is not None:
+if args.m:
 	margin = " " + marginName + " "
 	shutil.copyfile(str(marginPath), marginName)
-if args.f is not None:
+if args.f:
 		footer = " " + footerName + " "
 		shutil.copyfile(footerPath, footer.strip())
 		append = " -append "
