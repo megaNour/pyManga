@@ -16,7 +16,8 @@ start = time.time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", help="pagination index starts at ?")
-parser.add_argument("-m", help="margin width between pages ?")
+parser.add_argument("-m", action='store_true', help="put generic margins between pages")
+parser.add_argument("-f", action='store_true', help="put generic footer after pages")
 parser.add_argument("-w", help="page width ?")
 args, unknown = parser.parse_known_args()
 
@@ -36,33 +37,38 @@ os.chdir("../scribus")
 magick = "" if os.name != "nt" else "magick "
 run(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " + os.path.abspath(f[0]) + " ../release/" + fileName + ".png", shell=True)
 #-crop 3036x4725+236+236 
-os.remove(f[0])
+#os.remove(f[0])
 
 os.chdir("../release")
 #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
-genericPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
-footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
+marginName = "margin.png"
+footerName = "footer.png"
+marginPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / marginName
+footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / footerName
 
-shutil.copyfile(str(genericPath), "margin.png")
-
+margin = " "
 footer = " "
-extra = " "
-if footerPath.exists():
-        footer = " footer.png "
-        shutil.copyfile(footerPath, footer.strip())
-        extra = " -append "
+append = " "
+if args.m is not None:
+	margin = " " + marginName + " "
+	shutil.copyfile(str(marginPath), margin)
+if args.f is not None:
+		footer = " " + footerName + " "
+		shutil.copyfile(footerPath, footer.strip())
+		append = " -append "
 
 beautify()
 
-command = magick + "convert -colorspace sRGB -append "
+command = magick + "convert -colorspace sRGB -append " 
 
 
 for path in glob.glob("*[0-9].png"):
         foot = footer if manager.getPageNumber(path) > 0 else " "
-        run(magick + "convert" + extra + basename(path) + foot + splitext(basename(path))[0] + ".jpg", shell=True)
-        command += basename(path) + " margin.png "
+        run(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg", shell=True)
+        command += basename(path) + margin
         
-command = re.sub("margin.png $", "", command)
+command = re.sub(margin + "$", "", command)
+command = re.sub("  +", " ", command)
 command += footer + manager.getChapterName() + ".jpg"
 print(command)
 run(command, shell=True)
