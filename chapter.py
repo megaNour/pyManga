@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 import sys
 import re
@@ -5,8 +7,6 @@ import argparse
 import shutil
 import shutil
 from pathlib import Path
-
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-t", help="chapter title ?")

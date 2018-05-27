@@ -14,7 +14,7 @@ parser.add_argument("-a", type=int, help="number of items ?")
 args, unknown = parser.parse_known_args()
 
 if not args.n:
-    args.n = 14
+    args.n = 1
 
 if args.a:
     listKra = glob.glob("*[0-9].kra")
@@ -28,6 +28,6 @@ for i in range(1, args.n + 1):
     genericPath = Path(Path.cwd().absolute() / ".." / ".." / "generic" / extention / ("generic." + extention)).resolve()
     destinationFile = manager.seriesName + "_c" + manager.chapNum + "_p" + str(i).zfill(2) + "." + extention
     if not os.path.isfile(destinationFile):
-        shutil.copyfile(genericPath, destinationFile)
+        shutil.copyfile(str(genericPath), destinationFile)
 
 

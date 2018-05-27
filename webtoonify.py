@@ -21,7 +21,7 @@ parser.add_argument("-f", action='store_true', help="put generic footer after pa
 parser.add_argument("-w", help="page width ?")
 args, unknown = parser.parse_known_args()
 
-index =  args.i if args.i else 0
+index =  args.i if args.i else 1
 width = args.w if args.w else 800
 
 manager = Manager("..")
