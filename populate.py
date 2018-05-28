@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import glob
 import os.path
 import re
@@ -9,16 +11,16 @@ from manager import Manager
 manager = Manager("../")
 parser = argparse.ArgumentParser()
 parser.add_argument("-n", type=int, help="number of items ?")
-parser.add_argument("-a", type=int, help="number of items ?")
+parser.add_argument("-A", action="store_true", help="flag for not additional but total number")
 
 args, unknown = parser.parse_known_args()
 
 if not args.n:
     args.n = 1
 
-if args.a:
+if not args.A:
     listKra = glob.glob("*[0-9].kra")
-    args.n = len(listKra) + args.a
+    args.n += len(listKra)
 
 extention = Path.cwd().name
 

@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+
 import glob
 import zipfile
 import os
@@ -21,7 +22,7 @@ parser.add_argument("-f", action='store_true', help="put generic footer after pa
 parser.add_argument("-w", help="page width ?")
 args, unknown = parser.parse_known_args()
 
-index =  args.i if args.i else 1
+index =  args.i if args.i else 0
 width = args.w if args.w else 800
 
 manager = Manager("..")
@@ -62,7 +63,7 @@ beautify()
 command = magick + "convert -colorspace sRGB -append " 
 
 
-for path in glob.glob("*[0-9].png"):
+for path in sorted(glob.glob("*[0-9].png")):
 		foot, marge = footer, margin
 		if not manager.getPageNumber(path) > 0:
 				foot = marge = " "
