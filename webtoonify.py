@@ -55,7 +55,7 @@ if args.m:
 	shutil.copyfile(str(marginPath), marginName)
 if args.f:
 		footer = " " + footerName + " "
-		shutil.copyfile(footerPath, footer.strip())
+		shutil.copyfile(str(footerPath), footer.strip())
 		append = " -append "
 
 beautify()

@@ -30,3 +30,4 @@ class Manager:
         p = re.compile("_p(\d+)\.\w+$")
         m = p.search(basename(path))
         return int(m.group(1))
+        
