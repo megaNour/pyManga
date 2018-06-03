@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from constants import printAndRun
 import glob
 import zipfile
 import os
@@ -15,7 +16,7 @@ def produceFile(filePath):
     print(baseName + " ### Production")
     zipfile.ZipFile(filePath, "r").extract("mergedimage.png")
     #run([magick, "convert", "-resize", "800", "-density", "300", "mergedimage.png", "../jpg/" + baseName + ".jpg"], shell=True)
-    run(magick + "convert -resize 800 -density 300 mergedimage.png ../jpg/" + baseName + ".jpg", shell=True)
+    printAndRun(magick + "convert -resize 800 -density 300 mergedimage.png ../jpg/" + baseName + ".jpg")
     print("JPG => OK")
     shutil.move("mergedimage.png", "../png/" + baseName + ".png")
     print("PNG => OK")
@@ -34,7 +35,7 @@ magick = "" if os.name != "nt" else "magick "
 if len(sys.argv) == 1 :
     print(sys.argv)
     print(len(sys.argv))
-    for f in glob.glob("./*[0-9].kra"):
+    for f in sorted(glob.glob("./*[0-9].kra")):
         print(f)
         produceFile(f)
 else:
@@ -46,6 +47,6 @@ else:
             for i in range(int(split[0]), int(split[1])+1):
                 findAndProduce(str(i))
                 
-print("time taken: %.2f " % (time.time() - start))
+print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
 

@@ -1,3 +1,4 @@
+import constants
 import re
 import os
 from os.path import basename
@@ -27,7 +28,7 @@ class Manager:
         return self.seriesName + "_c" + self.chapNum
 
     def getPageNumber(self, path):
-        p = re.compile("_p(\d+)\.\w+$")
+        p = re.compile(constants.INDEXED_FILENAME_PATTERN)
         m = p.search(basename(path))
         return int(m.group(1))
         
