@@ -28,27 +28,57 @@ index =  args.i if args.i else 0
 width = args.w if args.w else 800
 
 manager = Manager("..")
-
-
-
-os.chdir("../release")
-for garbage in glob.glob("*") : shutil.rmtree(garbage, ignore_errors=True)
-for garbage in glob.glob("*") : 
-    if os.path.isfile(garbage): os.remove(garbage)
-
-os.chdir("../scribus")
-scrolls = glob.glob("*.sla")
-if len(scrolls) > 0:
-    for scroll in scrolls: os.mkdir("../release/" + splitext(basename(scroll))[0])
-
+scrollSuffix = "_scroll.jpg"
 magick = "" if os.name != "nt" else "magick "
 append = " " if not args.f else " -append "
 
-targets = constants.getTargets(glob.glob("./*.pdf"), args.s)
+command = magick + "convert -colorspace sRGB -append " 
+
+def doMagick():
+    auxCommand = command
+    global append
+    for path in sorted(glob.glob("*[0-9].png")):	
+        shutil.copyfile(path, "../" + basename(path)) 
+        foot = marge = " "
+        if args.f:
+            foot = " " + str(footerPath) + " "
+            append = " -append "
+        if args.m:
+            marge = " " + str(marginPath) + " "
+        if not manager.getPageNumber(path) > 1:
+               foot = marge = " "
+        printAndRun(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
+        auxCommand += " " + basename(path) + marge
+        shutil.copyfile("../" + basename(path), basename(path))
+    auxCommand = re.sub(" " + str(marginPath) + " $", "", auxCommand)
+    auxCommand = re.sub("  +", " ", auxCommand)
+    if args.f: auxCommand += " " + str(footerPath) + " "
+    auxCommand += manager.getChapterName() + scrollSuffix
+    printAndRun(auxCommand)
+    
+
+os.chdir("../release")
+
+"""
+for garbage in glob.glob("*") : shutil.rmtree(garbage, ignore_errors=True)
+"""
+for garbage in glob.glob("*"): 
+    if os.path.isfile(garbage): os.remove(garbage)
+
+shutil.rmtree("scrolls", ignore_errors=True)
+
+
+os.chdir("../scribus")
+scrolls = constants.getTargets(glob.glob("*.pdf"), args.s)
+#if len(scrolls) > 0:
+for scroll in scrolls: 
+    shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
+    os.mkdir("../release/" + splitext(basename(scroll))[0])
+
+targets = constants.getTargets(glob.glob("*.pdf"), args.s)
 for pdf in targets:
     fileName = splitext(basename(pdf))[0]
-    subfolder = fileName + "/" if len(targets) > 1 else ""
-    
+    subfolder = fileName + "/" # if len(targets) > 1 else ""
     printAndRun(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " 
     + os.path.abspath(pdf) + " ../release/" + subfolder + fileName + ".png")
     #-crop 3036x4725+236+236 
@@ -64,37 +94,24 @@ os.chdir("../release")
 
 print("########################################")
 
-listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
-for dirName in listDir:
-    os.chdir(dirName)
-    for fileName in glob.glob("*"):
-        shutil.copyfile(basename(fileName), "../" + fileName)
-    os.chdir("..")
-
 import beautify
 
-command = magick + "convert -colorspace sRGB -append " 
+listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
+releaseDir = os.getcwd()
+for dirName in listDir:
+    if dirName in (target.split(".")[0] for target in targets): 
+        os.chdir(dirName)
+        doMagick()
+        shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
+    beautify.beautify()
+    os.chdir(releaseDir)
 
-for path in sorted(glob.glob("*[0-9].png")):		
-    foot = marge = " "
-    if args.f:
-        foot = " " + str(footerPath) + " "
-        append = " -append "
-    if args.m:
-        marge = " " + str(marginPath) + " "
-    if not manager.getPageNumber(path) > 1:
-           foot = marge = " "
-    print("for path: " + path + ": " + str(manager.getPageNumber(path)))
-    print("foot: " + foot)
-    printAndRun(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
-    command += basename(path) + marge
-      
-command = re.sub(" " + str(marginPath) + " $", "", command)
-command = re.sub("  +", " ", command)
-if args.f: command += " " + str(footerPath) + " "
-command += manager.getChapterName() + ".jpg"
-printAndRun(command)
-
+doMagick()
+os.mkdir("scrolls")
+for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
+    shutil.copyfile(scroll, "scrolls/" + basename(scroll))
+for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
+    os.remove(garbage)
 for path in glob.glob("*.png"): os.remove(path)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
