@@ -38,7 +38,6 @@ def doMagick():
     auxCommand = command
     global append
     for path in sorted(glob.glob("*[0-9].png")):	
-        shutil.copyfile(path, "../" + basename(path)) 
         foot = marge = " "
         if args.f:
             foot = " " + str(footerPath) + " "
@@ -49,7 +48,6 @@ def doMagick():
                foot = marge = " "
         printAndRun(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
         auxCommand += " " + basename(path) + marge
-        shutil.copyfile("../" + basename(path), basename(path))
     auxCommand = re.sub(" " + str(marginPath) + " $", "", auxCommand)
     auxCommand = re.sub("  +", " ", auxCommand)
     if args.f: auxCommand += " " + str(footerPath) + " "
@@ -65,7 +63,8 @@ for garbage in glob.glob("*") : shutil.rmtree(garbage, ignore_errors=True)
 for garbage in glob.glob("*"): 
     if os.path.isfile(garbage): os.remove(garbage)
 
-shutil.rmtree("scrolls", ignore_errors=True)
+shutil.rmtree("../scrolls", ignore_errors=True)
+shutil.rmtree("../panels", ignore_errors=True)
 
 
 os.chdir("../scribus")
@@ -99,20 +98,25 @@ import beautify
 listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
 releaseDir = os.getcwd()
 for dirName in listDir:
-    if dirName in (target.split(".")[0] for target in targets): 
-        os.chdir(dirName)
-        doMagick()
-        shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
-    beautify.beautify()
+    os.chdir(dirName)
+    doMagick()
+    for pngFile in glob.glob("*.png"):
+        shutil.copyfile(pngFile, "../" + pngFile) 
+    shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
     os.chdir(releaseDir)
 
 doMagick()
-os.mkdir("scrolls")
+os.mkdir("../scrolls")
+os.mkdir("../panels")
 for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
-    shutil.copyfile(scroll, "scrolls/" + basename(scroll))
+    shutil.move(scroll, "../scrolls/" + basename(scroll))
 for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
     os.remove(garbage)
 for path in glob.glob("*.png"): os.remove(path)
+for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
+beautify.beautify()
+os.chdir("../panels")
+beautify.beautify()
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
