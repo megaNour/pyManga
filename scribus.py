@@ -9,9 +9,8 @@ import argparse
 #import shutil
 from pathlib import Path
 
-scribusPath = os.environ["SCRIBUSPATH"]
 scribusScriptsPath = os.environ["SCRIBUSSCRIPTSPATH"] + "/"
-scribus = "scribusNour.AppImage" if os.name !="nt" else "\"" + scribusPath + "/Scribus.exe" + "\""
+scribus = "scribusNour.AppImage" if os.name !="nt" else "\"" + os.environ["SCRIBUSPATH"] + "/Scribus.exe" + "\""
 pages = ""
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", nargs="*", help="pages, accept x, y, x-z...")

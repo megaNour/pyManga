@@ -21,12 +21,13 @@ def rename(swapNamePrefix: str, start: int, step: int, patternStr: str, newNameS
                 newPrefix = manager.getPageName(start, matcher.group(2))                
             newPath = swapNamePrefix + newPrefix
             shutil.move(path, newPath)
+            start += step
         else :
             print(path + " doesn't comply to the patern")
-        start += step
+        
 
 def beautify(swapNamePrefix: str = "", start: int = 1, step: int = 1, pattern: str = constants.INDEXED_FILENAME_PATTERN, newNameSuffix="managerInfered"):
-    rename("beautiful_", start, step, pattern, newNameSuffix)
+    rename(beautifulPrefix, start, step, pattern, newNameSuffix)
     rename(swapNamePrefix, start, step, pattern, newNameSuffix)
 
 parser = argparse.ArgumentParser()
@@ -41,8 +42,9 @@ pattern = args.pattern if args.pattern else constants.INDEXED_FILENAME_PATTERN
 start = int(args.start) if args.start else 1
 step = int(args.step) if args.step else 1
 newNameSuffix = args.name if args.name else "managerInfered"
+beautifulPrefix = "beautiful_"
 
 manager = Manager("..")
-beautify(pattern, start=start, step=step, newNameSuffix=newNameSuffix)
+beautify(pattern=pattern, start=start, step=step, newNameSuffix=newNameSuffix)
 
 

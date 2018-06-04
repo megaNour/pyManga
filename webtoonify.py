@@ -34,7 +34,7 @@ append = " " if not args.f else " -append "
 
 command = magick + "convert -colorspace sRGB -append " 
 
-def doMagick():
+def doMagick(extraPath="", doCopy=True):
     auxCommand = command
     global append
     for path in sorted(glob.glob("*[0-9].png")):	
@@ -46,13 +46,13 @@ def doMagick():
             marge = " " + str(marginPath) + " "
         if not manager.getPageNumber(path) > 1:
                foot = marge = " "
-        printAndRun(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
+        if doCopy:
+            printAndRun(magick + "convert" + append + path + foot + extraPath + "../panels/" + path)
         auxCommand += " " + basename(path) + marge
     auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
     auxCommand = re.sub("  +", " ", auxCommand)
     if args.f: auxCommand += " " + str(footerPath) + " "
     auxCommand += manager.getChapterName() + scrollSuffix
-    print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE1" + auxCommand)
     printAndRun(auxCommand)
     
 
@@ -96,6 +96,9 @@ for pdf in targets:
 
 os.chdir("../release")
 
+os.mkdir("../scrolls")
+os.mkdir("../panels")
+
 marginPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
 footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
 
@@ -105,29 +108,29 @@ import beautify
 
 listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
 releaseDir = os.getcwd()
-print("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM3")
 print(listDir)
 for dirName in listDir:
     os.chdir(dirName)	
-    print("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM2")
     print(os.getcwd())
-    doMagick()
+    doMagick("../")
     for pngFile in glob.glob("*.png"):
         shutil.copyfile(pngFile, "../" + pngFile) 
     shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
     os.chdir(releaseDir)
-doMagick()
-os.mkdir("../scrolls")
-os.mkdir("../panels")
+doMagick(doCopy=False)
+
 for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
     shutil.move(scroll, "../scrolls/" + basename(scroll))
-for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
-    os.remove(garbage)
+#for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
+#    os.remove(garbage)
 for path in glob.glob("*.png"): os.remove(path)
-for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
+#for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
 beautify.beautify()
 os.chdir("../panels")
 beautify.beautify(start=0)
+for imagePath in glob.glob("*.png"):
+    printAndRun(magick + "convert " + imagePath + " -crop 800x1200 " + imagePath.split(".")[0] + "_%d" + ".jpg")
+    os.remove(imagePath)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
