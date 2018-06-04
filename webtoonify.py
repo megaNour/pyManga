@@ -48,10 +48,11 @@ def doMagick():
                foot = marge = " "
         printAndRun(magick + "convert" + append + basename(path) + foot + splitext(basename(path))[0] + ".jpg")
         auxCommand += " " + basename(path) + marge
-    auxCommand = re.sub(" " + str(marginPath) + " $", "", auxCommand)
+    auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
     auxCommand = re.sub("  +", " ", auxCommand)
     if args.f: auxCommand += " " + str(footerPath) + " "
     auxCommand += manager.getChapterName() + scrollSuffix
+    print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE1" + auxCommand)
     printAndRun(auxCommand)
     
 
@@ -62,19 +63,24 @@ for garbage in glob.glob("*") : shutil.rmtree(garbage, ignore_errors=True)
 """
 for garbage in glob.glob("*"): 
     if os.path.isfile(garbage): os.remove(garbage)
+	#empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
+    elif not os.listdir(garbage): os.rmdir(garbage)
 
+#cleaning	
 shutil.rmtree("../scrolls", ignore_errors=True)
 shutil.rmtree("../panels", ignore_errors=True)
 
 
 os.chdir("../scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.s)
-#if len(scrolls) > 0:
+#removing only the directories targeted.
+#We removed empty dirs and now dirs to be updated. So we keep the not empty dirs that don't need update
 for scroll in scrolls: 
     shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
     os.mkdir("../release/" + splitext(basename(scroll))[0])
 
 targets = constants.getTargets(glob.glob("*.pdf"), args.s)
+
 for pdf in targets:
     fileName = splitext(basename(pdf))[0]
     subfolder = fileName + "/" # if len(targets) > 1 else ""
@@ -86,10 +92,12 @@ for pdf in targets:
         os.remove(pdf)
     
     #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
-    marginPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
-    footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
+    
 
 os.chdir("../release")
+
+marginPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
+footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
 
 print("########################################")
 
@@ -97,14 +105,17 @@ import beautify
 
 listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
 releaseDir = os.getcwd()
+print("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM3")
+print(listDir)
 for dirName in listDir:
-    os.chdir(dirName)
+    os.chdir(dirName)	
+    print("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM2")
+    print(os.getcwd())
     doMagick()
     for pngFile in glob.glob("*.png"):
         shutil.copyfile(pngFile, "../" + pngFile) 
     shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
     os.chdir(releaseDir)
-
 doMagick()
 os.mkdir("../scrolls")
 os.mkdir("../panels")

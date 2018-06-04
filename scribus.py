@@ -10,7 +10,8 @@ import argparse
 from pathlib import Path
 
 scribusPath = os.environ["SCRIBUSPATH"]
-scribus = "scribusNour.AppImage"
+scribusScriptsPath = os.environ["SCRIBUSSCRIPTSPATH"] + "/"
+scribus = "scribusNour.AppImage" if os.name !="nt" else "\"" + scribusPath + "/Scribus.exe" + "\""
 pages = ""
 parser = argparse.ArgumentParser()
 parser.add_argument("-p", nargs="*", help="pages, accept x, y, x-z...")
@@ -31,5 +32,5 @@ if args.s:
 
 parent = Path.cwd().absolute()
 
-printAndRun(scribus + " -g -ns -py " + scribusPath  + "pdf.py" 
+printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf.py" 
 + " -d " + str(parent) + scrollsArgs + pagesArgs)
