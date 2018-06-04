@@ -4,33 +4,39 @@ import os
 import glob
 import re
 import shutil
+import argparse
 from manager import Manager
 from pathlib import Path
 
-
-def rename(newNamePrefix):
-    i = 0    
+def rename(newNamePrefix: str, start: int, step: int, patternStr: str):
     targets = glob.glob("*")
     targets.sort()
-    pattern = re.compile(constants.INDEXED_FILENAME_PATTERN)
+    pattern = re.compile(patternStr)
     for path in (path for path in targets if os.path.isfile(path)):
-#    for path in targets if (os.path.isfile(path)):
         matcher = pattern.search(path)
-        i += 1
-#        newIndex = i if not len(newNamePrefix) else matcher.group(1)
-        newIndex = i
         if matcher:        
-            newPath = newNamePrefix + manager.getPageName(newIndex, matcher.group(2))
+            newPath = newNamePrefix + manager.getPageName(start, matcher.group(2))
             shutil.move(path, newPath)
-            #print(manager.getPageName(matcher.group(1), matcher.group(2)))
         else :
             print(path + " doesn't comply to the patern")
+        start += step
 
-def beautify():
-    rename("beautiful_")
-    rename("")
+def beautify(newNamePrefix: str = "", start: int = 1, step: int = 1, pattern: str = constants.INDEXED_FILENAME_PATTERN):
+    rename("beautiful_", start, step, pattern)
+    rename(newNamePrefix, start, step, pattern)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--pattern", nargs="?", help="pattern to target")
+parser.add_argument("--start", nargs="?", help="index start for renamed files")
+parser.add_argument("--step", nargs="?", help="increment step for renamed files")
+
+args, unknown = parser.parse_known_args()
+
+newNamePrefix = args.pattern if args.pattern else ""
+start = int(args.start) if args.start else 1
+step = int(args.step) if args.step else 1
 
 manager = Manager("..")
-beautify()
+beautify(newNamePrefix, start, step)
 
 

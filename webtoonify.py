@@ -116,7 +116,7 @@ for path in glob.glob("*.png"): os.remove(path)
 for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
 beautify.beautify()
 os.chdir("../panels")
-beautify.beautify()
+beautify.beautify(start=0)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
