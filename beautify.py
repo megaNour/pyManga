@@ -33,14 +33,16 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--pattern", nargs="?", help="pattern to target")
 parser.add_argument("--start", nargs="?", help="index start for renamed files")
 parser.add_argument("--step", nargs="?", help="increment step for renamed files")
+parser.add_argument("--name", nargs="?", help="increment step for renamed files")
 
 args, unknown = parser.parse_known_args()
 
-newNamePrefix = args.pattern if args.pattern else "managerInfered"
+pattern = args.pattern if args.pattern else constants.INDEXED_FILENAME_PATTERN
 start = int(args.start) if args.start else 1
 step = int(args.step) if args.step else 1
+newNamePrefix = args.name if args.name else "managerInfered"
 
 manager = Manager("..")
-beautify(start=start, step=step, newNamePrefix=newNamePrefix)
+beautify(pattern, start=start, step=step, newNamePrefix=newNamePrefix)
 
 
