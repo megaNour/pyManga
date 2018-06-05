@@ -41,6 +41,8 @@ if not args.P:
 os.chdir("scribus")
 print("9999999999999999999999999")
 print(os.getcwd())
+if not args.D:
+    for pdf in glob.glob("*.pdf"): os.remove(pdf)
 import scribus2
 import webtoonify2
            

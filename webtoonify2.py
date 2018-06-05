@@ -132,6 +132,7 @@ for dirName in listDir:
         shutil.copyfile(pngFile, "../" + pngFile) 
     shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
     os.chdir(releaseDir)
+
 doMagick(doCopy=False)
 
 for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 

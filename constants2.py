@@ -34,7 +34,7 @@ def getTargets(possibleTargets, pointers):
     return targets
 
 def zfillParamString(paramString, zeroes):
-    re.sub(r'\d+', lambda x: x.group(0).zfill(zeroes), paramString)
+    return re.sub(r'\d+', lambda x: x.group(0).zfill(zeroes), paramString)
 
 def getIndexStart(name):
 	print("name: " + name)
