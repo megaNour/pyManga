@@ -24,7 +24,13 @@ if args.p:
     pagesArgs = " -p " + ",".join(args.p)
     pagesArgs = constants.zfillParamString(pagesArgs, 2)
 
+"""
+if args.s:
+	targets = constants.getTargets(glob.glob("*.sla"), args.s)
+	scrollsArgs = " -s " + ",".join(targets)
+"""
+	
 parent = Path.cwd().absolute()
 
-printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf2.py" 
-+ " -d " + str(parent) + pagesArgs)
+printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf2.py"  
++ " -d " + str(parent) + pagesArgs) 

@@ -39,7 +39,8 @@ if not args.P:
     os.chdir("..")
 
 os.chdir("scribus")
-
+print("9999999999999999999999999")
+print(os.getcwd())
 import scribus2
 import webtoonify2
            

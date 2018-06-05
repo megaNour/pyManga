@@ -3,8 +3,9 @@ import os
 import re
 
 INDEXED_FILENAME_PATTERN="\D_([\d_\-]+)\.(\w+)$"
-pattern = re.compile(INDEXED_FILENAME_PATTERN)
-
+INDEXED_SCROLL_PATTERN="_(\d+)(-(\d+))?(\.\w*)?$"
+patternFile = re.compile(INDEXED_FILENAME_PATTERN)
+patternScroll = re.compile(INDEXED_SCROLL_PATTERN)
 def printAndRun(command):
     print(command)
     call(command, shell = True)
@@ -23,7 +24,7 @@ def listList(entries):
     return sorted(result)
 
 def getFileNameIndexAndExtention(fileName):
-    matcher = pattern.search(fileName)
+    matcher = patternFile.search(fileName)
     return matcher.group(1), matcher.group(2)
 
 def getTargets(possibleTargets, pointers):
@@ -34,3 +35,11 @@ def getTargets(possibleTargets, pointers):
 
 def zfillParamString(paramString, zeroes):
     re.sub(r'\d+', lambda x: x.group(0).zfill(zeroes), paramString)
+
+def getIndexStart(name):
+	print("name: " + name)
+	matcher = patternScroll.search(name)
+	return matcher
+	
+def removeRange(name):
+	return re.split(INDEXED_SCROLL_PATTERN, name)[0]

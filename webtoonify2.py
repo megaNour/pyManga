@@ -1,7 +1,7 @@
 #!/usr/bin/python3
-import constants
+import constants2 as constants
 import beautify
-from constants import printAndRun
+from constants2 import printAndRun
 import glob
 import zipfile
 import os
@@ -16,7 +16,6 @@ import shutil
 start = time.time()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", help="pagination index starts at ?")
 parser.add_argument("-m", action="store_true", help="put generic margins between pages")
 parser.add_argument("-f", action="store_true", help="put generic footer after pages")
 parser.add_argument("-p", nargs="*", help="scribus pdf scrolls to be released as ranges: a-b, e-g, k, x-z...")
@@ -26,7 +25,6 @@ parser.add_argument("-F", action="store_true", help="flush release folder from o
 
 args, unknown = parser.parse_known_args()
 
-index =  args.i if args.i else 0
 width = args.w if args.w else 800
 
 manager = Manager("..")
@@ -36,7 +34,7 @@ append = " " if not args.f else " -append "
 
 command = magick + "convert -colorspace sRGB -append " 
 
-def doMagick(extraPath="", doCopy=True):
+def doMagick(doCopy=True, extraPath="../"):
     auxCommand = command
     global append
     for path in sorted(glob.glob("*[0-9].png")):	
@@ -78,7 +76,6 @@ os.chdir("scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
 #removing only the directories targeted.
 #We removed empty dirs and now dirs to be updated. So we keep the not empty dirs that don't need update
-
 for scroll in scrolls: 
     shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
     os.mkdir("../release/" + splitext(basename(scroll))[0])
@@ -86,20 +83,30 @@ for scroll in scrolls:
 print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(glob.glob("*.pdf"))
 print("###############")
-print(args.p)
 targets = constants.getTargets(glob.glob("*.pdf"), args.p)
-
+print(targets)
 for pdf in targets:
-    fileName = splitext(basename(pdf))[0]
-    #subfolder = fileName + "/" # if len(targets) > 1 else ""
-    printAndRun(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " 
-    + os.path.abspath(pdf) + " ../release/" + fileName + "/" + fileName + "_%d.png")
-    #-crop 3036x4725+236+236 
+	fileName = splitext(basename(pdf))[0]
+	fileShortName = constants.removeRange(fileName)
+	print(pdf)
+	print(fileName)
+	print(fileShortName)
+	# match = constants.getIndexStart(fileName)
+	# if match is not None:
+		# index = str(match.group(1))
+	# else: index = "1"
+	match = constants.getIndexStart(fileName)
+	index = "1" if match is None else str(match.group(1))
+	
+	#subfolder = fileName + "/" # if len(targets) > 1 else ""
+	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
+	+ os.path.abspath(pdf) + " ../release/" + fileName + "/" + fileShortName + "_%02d.png")
+	#-crop 3036x4725+236+236 
 
-    if not args.D:
-        os.remove(pdf)
-    
-    #run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
+	if not args.D:
+		os.remove(pdf)
+
+	#run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
     
 
 os.chdir("../release")
@@ -136,9 +143,14 @@ for path in glob.glob("*.png"): os.remove(path)
 beautify.beautify()
 os.chdir("../panels")
 #beautify.beautify(start=0)
+
 for imagePath in glob.glob("*.png"):
-    printAndRun(magick + "convert " + imagePath + " -crop 800x1200 " + imagePath.split(".")[0] + "_%d" + ".jpg")
-    os.remove(imagePath)
+	niceCut = splitext(imagePath)[0].rsplit("_", 1)
+	if int(niceCut[1]) == 1 and not os.path.isfile(niceCut[0] + "_" + str(int(niceCut[1])+1).zfill(2) + splitext(imagePath)[1]):
+		shutil.move(imagePath, niceCut[0] + splitext(imagePath)[1])
+		imagePath = niceCut[0] + splitext(imagePath)[1]
+	printAndRun(magick + "convert " + imagePath + " -crop 800x1200 -scene 1 " + imagePath.split(".")[0] + ".jpg")
+	os.remove(imagePath)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
