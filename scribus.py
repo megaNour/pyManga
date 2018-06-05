@@ -31,5 +31,5 @@ if args.s:
 
 parent = Path.cwd().absolute()
 
-printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf.py" 
-+ " -d " + str(parent) + scrollsArgs + pagesArgs)
+printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf2.py" 
++ " -d " + str(parent) + pagesArgs)

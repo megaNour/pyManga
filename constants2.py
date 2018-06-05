@@ -1,32 +1,36 @@
-from subprocess import run
+from subprocess import call
 import os
 import re
 
 INDEXED_FILENAME_PATTERN="\D(\d+)\.(\w+)$"
 pattern = re.compile(INDEXED_FILENAME_PATTERN)
 
-def printAndRun(command: str):
+def printAndRun(command):
     print(command)
-    run(command, shell = True)
+    call(command, shell = True)
 
-def listString(listString: str, splitter:str=",") -> list:
+def listString(listString, splitter=","):
+    print("##############################################")
+    print("##############################################")
+    print("##############################################")
+    print("##############################################")
     return listList(listString.split(splitter))
     
-def listList(entries: list):
+def listList(entries):
     result = []    
     for entry in entries:
         entry = str(entry)
         if "-" in entry:
             low, high = entry.split("-")
-            result.extend(range(int(low), int(high)+1))
+            result.extend(range(int(low), int(high) + 1))
         else: result.append(int(entry))
     return sorted(result)
 
-def getFileNameIndexAndExtention(fileName: str) -> (str, str):
+def getFileNameIndexAndExtention(fileName):
     matcher = pattern.search(fileName)
     return matcher.group(1), matcher.group(2)
 
-def getTargets(possibleTargets: list(), pointers: list()) -> list:
+def getTargets(possibleTargets, pointers):
     targets = list(possibleTargets)
     if pointers is not None: 
         params = listList(pointers)
