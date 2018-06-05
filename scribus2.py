@@ -22,7 +22,7 @@ args, unknown = parser.parse_known_args()
 pagesArgs = ""
 if args.p:
     pagesArgs = " -p " + ",".join(args.p)
-    pagesArgs = re.sub(r'\d+', lambda x: x.group(0).zfill(2), pagesArgs)
+    pagesArgs = constants.zfillParamString(pagesArgs, 2)
 
 parent = Path.cwd().absolute()
 

@@ -30,5 +30,8 @@ def getTargets(possibleTargets: list(), pointers: list()) -> list:
     targets = list(possibleTargets)
     if pointers is not None: 
         params = listList(pointers)
-        targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in params]
+        targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in [zfillParamString(str(param), 2) for param in params]]
     return targets
+
+def zfillParamString(paramString: str, zeroes: int):
+    return re.sub(r'\d+', lambda x: x.group(0).zfill(zeroes), paramString)

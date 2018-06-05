@@ -83,6 +83,10 @@ for scroll in scrolls:
     shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
     os.mkdir("../release/" + splitext(basename(scroll))[0])
 
+print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+print(glob.glob("*.pdf"))
+print("###############")
+print(args.p)
 targets = constants.getTargets(glob.glob("*.pdf"), args.p)
 
 for pdf in targets:

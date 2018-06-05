@@ -28,7 +28,8 @@ class Manager:
         return self.seriesName + "_c" + self.chapNum
 
     def getPageNumber(self, path):
+        print("#################path: " + path)
         p = re.compile(constants.INDEXED_FILENAME_PATTERN)
         m = p.search(basename(path))
-        return int(m.group(1))
+        return m.group(1)
         
