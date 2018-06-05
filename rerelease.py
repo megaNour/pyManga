@@ -14,8 +14,8 @@ start = time.time()
 parser = argparse.ArgumentParser()
 parser.add_argument("-P", action="store_true", help="flag for not producing pages. Usefull to just run the scribus part")
 parser.add_argument("-p", nargs="*", help="pages to be released >>> FROM ALL SCRIBUS SCROLLS <<<, accept x, y, x-z...")
-parser.add_argument("-s", nargs="*", help="scribus pdf scrolls to be released, accept x, y, x-z...")
 parser.add_argument("-D", action="store_true", help="spare base pdf flag")
+parser.add_argument("-F", action="store_true", help="flush release folder from old cache")
 
 
 args, unknown = parser.parse_known_args()
@@ -39,14 +39,10 @@ if not args.P:
     os.chdir("..")
 
 os.chdir("scribus")
-import scribus
-"""
-if args.D:
-    sys.argv.append("-D")
-    sys.argv.append("True")
 
-import webtoonify
-"""             
+import scribus2
+import webtoonify2
+           
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
 

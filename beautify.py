@@ -8,7 +8,25 @@ import argparse
 from manager import Manager
 from pathlib import Path
 
-def rename(swapNamePrefix: str, start: int, step: int, patternStr: str, newNameSuffix: str):
+manager = Manager("..")
+
+def rename(swapNamePrefix: str, patternStr: str, newNameSuffix: str):
+    #start becomes the index
+    targets = glob.glob("*")
+    targets.sort()
+    pattern = re.compile(patternStr)
+    for path in (path for path in targets if os.path.isfile(path)):
+        matcher = pattern.search(path)
+        if matcher:        
+            newPrefix = newNameSuffix
+            if newNameSuffix == "managerInfered":
+                newPrefix = manager.getPageName(matcher.group(1), matcher.group(2))                
+            newPath = swapNamePrefix + newPrefix
+            shutil.move(path, newPath)
+        else :
+            print(path + " doesn't comply to the patern")
+        
+def reindex(swapNamePrefix: str, start: int, step: int, patternStr: str, newNameSuffix: str):
     #start becomes the index
     targets = glob.glob("*")
     targets.sort()
@@ -24,11 +42,11 @@ def rename(swapNamePrefix: str, start: int, step: int, patternStr: str, newNameS
             start += step
         else :
             print(path + " doesn't comply to the patern")
-        
+
 
 def beautify(swapNamePrefix: str = "", start: int = 1, step: int = 1, pattern: str = constants.INDEXED_FILENAME_PATTERN, newNameSuffix="managerInfered"):
-    rename(beautifulPrefix, start, step, pattern, newNameSuffix)
-    rename(swapNamePrefix, start, step, pattern, newNameSuffix)
+    rename(beautifulPrefix, pattern, newNameSuffix)
+    rename(swapNamePrefix, pattern, newNameSuffix)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--pattern", nargs="?", help="pattern to target")
@@ -43,8 +61,5 @@ start = int(args.start) if args.start else 1
 step = int(args.step) if args.step else 1
 newNameSuffix = args.name if args.name else "managerInfered"
 beautifulPrefix = "beautiful_"
-
-manager = Manager("..")
-beautify(pattern=pattern, start=start, step=step, newNameSuffix=newNameSuffix)
 
 

@@ -19,9 +19,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-i", help="pagination index starts at ?")
 parser.add_argument("-m", action="store_true", help="put generic margins between pages")
 parser.add_argument("-f", action="store_true", help="put generic footer after pages")
-parser.add_argument("-s", nargs="*", help="scribus pdf scrolls to be released, accept x, y, x-z...")
+parser.add_argument("-p", nargs="*", help="scribus pdf scrolls to be released as ranges: a-b, e-g, k, x-z...")
 parser.add_argument("-w", help="page width ?")
 parser.add_argument("-D", action="store_true", help="spare base pdf flag")
+parser.add_argument("-F", action="store_true", help="flush release folder from old cache")
 
 args, unknown = parser.parse_known_args()
 
@@ -55,35 +56,40 @@ def doMagick(extraPath="", doCopy=True):
     if args.f: auxCommand += " " + str(footerPath) + " "
     auxCommand += manager.getChapterName() + scrollSuffix
     printAndRun(auxCommand)
-    
+if args.F:
+    shutil.rmtree("../release", ignore_errors=True)
+    os.mkdir("../release")
 
-os.chdir("../release")
+else: 
+    os.chdir("release")
+    for garbage in glob.glob("*"): 
+        if os.path.isfile(garbage): os.remove(garbage)
+	    #empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
+        elif not os.listdir(garbage): os.rmdir(garbage)
 
-for garbage in glob.glob("*"): 
-    if os.path.isfile(garbage): os.remove(garbage)
-	#empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
-    elif not os.listdir(garbage): os.rmdir(garbage)
+os.chdir("..")
 
 #cleaning	
-shutil.rmtree("../scrolls", ignore_errors=True)
-shutil.rmtree("../panels", ignore_errors=True)
+shutil.rmtree("scrolls", ignore_errors=True)
+shutil.rmtree("panels", ignore_errors=True)
 
 
-os.chdir("../scribus")
-scrolls = constants.getTargets(glob.glob("*.pdf"), args.s)
+os.chdir("scribus")
+scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
 #removing only the directories targeted.
 #We removed empty dirs and now dirs to be updated. So we keep the not empty dirs that don't need update
+
 for scroll in scrolls: 
     shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
     os.mkdir("../release/" + splitext(basename(scroll))[0])
 
-targets = constants.getTargets(glob.glob("*.pdf"), args.s)
+targets = constants.getTargets(glob.glob("*.pdf"), args.p)
 
 for pdf in targets:
     fileName = splitext(basename(pdf))[0]
-    subfolder = fileName + "/" # if len(targets) > 1 else ""
+    #subfolder = fileName + "/" # if len(targets) > 1 else ""
     printAndRun(magick + "convert -density 300 -scene " + str(index) + " -resize " + str(width) + " " 
-    + os.path.abspath(pdf) + " ../release/" + subfolder + fileName + ".png")
+    + os.path.abspath(pdf) + " ../release/" + fileName + "/" + fileName + "_%d.png")
     #-crop 3036x4725+236+236 
 
     if not args.D:

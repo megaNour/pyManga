@@ -2,7 +2,7 @@ from subprocess import run
 import os
 import re
 
-INDEXED_FILENAME_PATTERN="\D(\d+)\.(\w+)$"
+INDEXED_FILENAME_PATTERN="\D_([\d_\-]+)\.(\w+)$"
 pattern = re.compile(INDEXED_FILENAME_PATTERN)
 
 def printAndRun(command: str):
@@ -30,5 +30,5 @@ def getTargets(possibleTargets: list(), pointers: list()) -> list:
     targets = list(possibleTargets)
     if pointers is not None: 
         params = listList(pointers)
-        targets = [scroll for scroll in possibleTargets if int(getFileNameIndexAndExtention(scroll)[0].strip("0")) in params]
+        targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in params]
     return targets
