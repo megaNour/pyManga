@@ -61,7 +61,7 @@ if args.F:
     os.mkdir("../release")
 
 else: 
-    os.chdir("release")
+    os.chdir("../release")
     for garbage in glob.glob("*"): 
         if os.path.isfile(garbage): os.remove(garbage)
 	    #empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
