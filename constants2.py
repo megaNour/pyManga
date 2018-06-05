@@ -29,8 +29,7 @@ def getFileNameIndexAndExtention(fileName):
 def getTargets(possibleTargets, pointers):
     targets = list(possibleTargets)
     if pointers is not None: 
-        params = listList(pointers)
-        targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in [zfillParamString(str(param), 2) for param in params]]
+        targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in [zfillParamString(str(param), 2) for param in pointers]]
     return targets
 
 def zfillParamString(paramString, zeroes):
