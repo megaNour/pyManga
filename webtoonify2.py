@@ -46,8 +46,8 @@ def doMagick(extraPath="", doCopy=True):
             append = " -append "
         if args.m:
             marge = " " + str(marginPath) + " "
-        if not manager.getPageNumber(path) > 1:
-               foot = marge = " "
+        #if not manager.getPageNumber(path) > 1:
+        #       foot = marge = " "
         if doCopy:
             printAndRun(magick + "convert" + append + path + foot + extraPath + "../panels/" + path)
         auxCommand += " " + basename(path) + marge
