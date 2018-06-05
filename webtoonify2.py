@@ -112,7 +112,7 @@ footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "foot
 
 print("########################################")
 
-beautify.beautify()
+#beautify.beautify()
 
 listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
 releaseDir = os.getcwd()
@@ -135,7 +135,7 @@ for path in glob.glob("*.png"): os.remove(path)
 #for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
 beautify.beautify()
 os.chdir("../panels")
-beautify.beautify(start=0)
+#beautify.beautify(start=0)
 for imagePath in glob.glob("*.png"):
     printAndRun(magick + "convert " + imagePath + " -crop 800x1200 " + imagePath.split(".")[0] + "_%d" + ".jpg")
     os.remove(imagePath)
