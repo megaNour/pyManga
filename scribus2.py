@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import constants
 from constants import printAndRun
+from manager import Manager
 import glob
 #import os.path
 import os
@@ -9,6 +10,9 @@ import argparse
 #import shutil
 from pathlib import Path
 import re
+
+manager = Manager("..")
+name = manager.getChapterName()
 
 scribusScriptsPath = os.environ["SCRIBUSSCRIPTSPATH"] + "/"
 scribus = "scribusNour.AppImage" if os.name !="nt" else "\"" + os.environ["SCRIBUSPATH"] + "/Scribus.exe" + "\""
@@ -24,13 +28,7 @@ if args.p:
     pagesArgs = " -p " + ",".join(args.p)
     pagesArgs = constants.zfillParamString(pagesArgs, 2)
 
-"""
-if args.s:
-	targets = constants.getTargets(glob.glob("*.sla"), args.s)
-	scrollsArgs = " -s " + ",".join(targets)
-"""
-	
-parent = Path.cwd().absolute()
+parent = os.getcwd()
 
 printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf2.py"  
-+ " -d " + str(parent) + pagesArgs) 
++ " -n " + name + " -d " + parent + pagesArgs) 
