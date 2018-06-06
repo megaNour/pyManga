@@ -36,11 +36,11 @@ command = magick + "convert -colorspace sRGB -append "
 
 def doMagick():
 	auxCommand = command
-	global append
+	global append, foot, marge
 	pngGlob = sorted(glob.glob("*.png"))
 	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG1")	
 	print(pngGlob)
-	targets = list()
+	targets = None
 	if not args.p:
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG2")
 		print(pngGlob)
@@ -65,7 +65,7 @@ def doMagick():
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG5")	
 		print(args.p)
 		for sequence in args.p:		
-			targets.extend(constants.getTargets(pngGlob, constants.listString(sequence)))
+			targets = (constants.getTargets(pngGlob, constants.listString(sequence)))
 	scrollIndex = 0
 	for path in targets:
 		scrollIndex += 1
@@ -91,13 +91,6 @@ if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
 	os.mkdir("../release")
 
-else: 
-	os.chdir("../release")
-	for garbage in glob.glob("*"): 
-		if os.path.isfile(garbage): os.remove(garbage)
-		#empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
-		elif not os.listdir(garbage): os.rmdir(garbage)
-
 os.chdir("..")
 
 #cleaning	
@@ -107,12 +100,6 @@ shutil.rmtree("panels", ignore_errors=True)
 
 os.chdir("scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
-#removing only the directories targeted.
-#We removed empty dirs and now dirs to be updated. So we keep the not empty dirs that don't need update
-
-#for scroll in scrolls: 
-#	shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
-#	os.mkdir("../release/" + splitext(basename(scroll))[0])
 
 print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(glob.glob("*.pdf"))
@@ -123,26 +110,14 @@ for pdf in targets:
 	fileName = splitext(basename(pdf))[0]
 	fileShortName = constants.removeRange(fileName)
 	print(pdf)
-	print(fileName)
-	print(fileShortName)
-	# match = constants.getIndexStart(fileName)
-	# if match is not None:
-		# index = str(match.group(1))
-	# else: index = "1"
 	match = constants.getIndexStart(fileName)
 	index = "1" if match is None else str(match.group(1))
-	
-	#printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
-	#+ os.path.abspath(pdf) + " ../release/" + fileShortName + "_%02d.png")
+
 	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
 	+ pdf + " ../release/" + fileShortName + "p%02d.png")	
 
-
 	if not args.D:
 		os.remove(pdf)
-
-	#run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
-	
 
 os.chdir("../release")
 
@@ -160,44 +135,11 @@ if args.m:
 	marge = " " + str(marginPath) + " "
 
 print("########################################")
-
-#beautify.beautify()
-"""
-listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
-releaseDir = os.getcwd()
-print(listDir)
-for dirName in listDir:
-	os.chdir(dirName)	
-	print(os.getcwd())
-	doMagick()
-	for pngFile in glob.glob("*.png"):
-		shutil.copyfile(pngFile, "../" + pngFile) 
-	shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
-	os.chdir(releaseDir)
-"""
 doMagick()
 print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
+
 print(os.getcwd())
-"""
-for sequence in args.p:
-	auxCommand = command
-	for image in constants.getTargets(glob.glob("*.png"), constants.listString(sequence))
-		auxCommand +=
-"""
-#for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
-#	shutil.move(scroll, "../scrolls/" + basename(scroll))
-
-
-#for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
-#	os.remove(garbage)
-
-#for path in glob.glob("*.png"): os.remove(path)
-#for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
-
-#beautify.beautify()
-
 os.chdir("../panels")
-#beautify.beautify(start=0)
 
 for imagePath in glob.glob("*.png"):
 	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
