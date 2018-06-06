@@ -51,12 +51,10 @@ def doMagick():
 			targets = args.p.split()
 		else: targets = list(pngGlob)
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
-		print(targets)
 		scrollTargets = list()
 		for scrollString in targets:
 			scrollTargets.append(constants.getTargets(pngGlob, constants.listString(scrollString)))
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG7")	
-		print(targets)
 		print(scrollTargets)
 		targets = list(scrollTargets)
 	else:
@@ -70,10 +68,11 @@ def doMagick():
 		scrollIndex += 1
 		auxCommand = command
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
-		print(targets)
 		print(path)
 		for fragment in path:
-			printAndRun(magick + "convert" + append + fragment + foot + "../panels/" + fragment)
+			export = magick + "convert" + append + fragment + foot + "../panels/" + fragment
+			if int(manager.getPageNumber(fragment)) == 1: export = export.replace(foot, " ")
+			printAndRun(export)
 			auxCommand += " " + basename(fragment) + marge
 		auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
 		auxCommand = re.sub("  +", " ", auxCommand)
@@ -81,7 +80,7 @@ def doMagick():
 		if args.f: auxCommand += " " + str(footerPath) + " "
 		auxCommand += "../scrolls/" + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + str(scrollIndex).zfill(2) + splitext(scrollSuffix)[1]
 		printAndRun(auxCommand)
-	bigScroll = glob.glob("*.png")
+	bigScroll = sorted(glob.glob("*.png"))
 	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
 	auxCommand = auxCommand.replace(marge, " ", 1)
 	printAndRun(auxCommand)
@@ -113,7 +112,7 @@ for pdf in targets:
 	index = "1" if match is None else str(match.group(1))
 
 	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
-	+ pdf + " ../release/" + fileShortName + "_p%02d.png")	
+	+ pdf + " ../release/" + manager.getChapterName() + "_p%02d.png")	
 
 	if not args.D:
 		os.remove(pdf)
@@ -143,6 +142,9 @@ os.chdir("../panels")
 for imagePath in glob.glob("*.png"):
 	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
 	os.remove(imagePath)
+
+#import pyManga.beautify
+
 #for imagePath in glob.glob("*-[0-9].jpg"):
 #	shutil.move(imagePath, imagePath.replace("-", "_"))
 

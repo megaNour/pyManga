@@ -1,4 +1,4 @@
-import constants2 as constants
+import pyManga.constants2 as constants
 import re
 import os
 from os.path import basename
@@ -28,8 +28,6 @@ class Manager:
 		return self.seriesName + "_c" + self.chapNum
 
 	def getPageNumber(self, path):
-		print("#################path: ")
-		print(path)
 		p = re.compile(constants.INDEXED_FILENAME_PATTERN)
 		m = p.search(basename(path))
 		return m.group(1)
