@@ -54,26 +54,37 @@ def doMagick():
 		else: targets = list(pngGlob)
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
 		print(targets)
-		targets = constants.getTargets(pngGlob, constants.listList(targets))
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
+		scrollTargets = list()
+		for scrollString in targets:
+			scrollTargets.append(constants.getTargets(pngGlob, constants.listString(scrollString)))
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG7")	
 		print(targets)
+		print(scrollTargets)
+		targets = list(scrollTargets)
 	else:
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG5")	
 		print(args.p)
 		for sequence in args.p:		
 			targets.extend(constants.getTargets(pngGlob, constants.listString(sequence)))
+	scrollIndex = 0
 	for path in targets:
+		scrollIndex += 1
+		auxCommand = command
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
 		print(targets)
 		print(path)
 			#if not manager.getPageNumber(path) > 1:
 			#	   foot = marge = " "
-		printAndRun(magick + "convert" + append + path + foot + "../panels/" + path)
-		auxCommand += " " + basename(path) + marge
-	auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
-	auxCommand = re.sub("  +", " ", auxCommand)
-	if args.f: auxCommand += " " + str(footerPath) + " "
-	auxCommand += manager.getChapterName() + scrollSuffix
+		for fragment in path:
+			printAndRun(magick + "convert" + append + fragment + foot + "../panels/" + fragment)
+			auxCommand += " " + basename(fragment) + marge
+		auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
+		auxCommand = re.sub("  +", " ", auxCommand)
+		if args.f: auxCommand += " " + str(footerPath) + " "
+		auxCommand += "../scrolls/" + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + str(scrollIndex).zfill(2) + splitext(scrollSuffix)[1]
+		printAndRun(auxCommand)
+	bigScroll = glob.glob("*.png")
+	auxCommand = command + marge.join(bigScroll).strip() + foot + manager.getChapterName() + scrollSuffix
 	printAndRun(auxCommand)
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
@@ -183,15 +194,17 @@ os.chdir("../panels")
 #beautify.beautify(start=0)
 
 for imagePath in glob.glob("*.png"):
-	niceCut = splitext(imagePath)[0].split("_p", 1)
 	indexParam = "_%02d"
 	scene = "-scene 1"
+	printAndRun(magick + "convert -crop 800x1200 " + scene + " " +  imagePath + " " + imagePath.split(".")[0] + indexParam + ".jpg")
+	niceCut = splitext(imagePath)[0].rsplit("_", 1)
 	if int(niceCut[1]) == 1 and not os.path.isfile(niceCut[0] + "_" + str(int(niceCut[1])+1).zfill(2) + splitext(imagePath)[1]):
 		shutil.move(imagePath, niceCut[0] + splitext(imagePath)[1])
 		imagePath = niceCut[0] + splitext(imagePath)[1]
 		indexParam = ""
 		scene = ""
-	printAndRun(magick + "convert " + imagePath + " -crop 800x1200 " + scene + " " + imagePath.split(".")[0] + indexParam + ".jpg")
+		print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	else: print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
 	os.remove(imagePath)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
