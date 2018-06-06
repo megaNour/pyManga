@@ -73,8 +73,8 @@ def doMagick():
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
 		print(targets)
 		print(path)
-			#if not manager.getPageNumber(path) > 1:
-			#	   foot = marge = " "
+		if not int(manager.getPageNumber(path[0])) > 1:
+			foot = marge = " "
 		for fragment in path:
 			printAndRun(magick + "convert" + append + fragment + foot + "../panels/" + fragment)
 			auxCommand += " " + basename(fragment) + marge
@@ -84,8 +84,9 @@ def doMagick():
 		auxCommand += "../scrolls/" + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + str(scrollIndex).zfill(2) + splitext(scrollSuffix)[1]
 		printAndRun(auxCommand)
 	bigScroll = glob.glob("*.png")
-	auxCommand = command + marge.join(bigScroll).strip() + foot + manager.getChapterName() + scrollSuffix
+	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls" + manager.getChapterName() + scrollSuffix
 	printAndRun(auxCommand)
+
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
 	os.mkdir("../release")
@@ -183,29 +184,26 @@ for sequence in args.p:
 	for image in constants.getTargets(glob.glob("*.png"), constants.listString(sequence))
 		auxCommand +=
 """
-for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
-	shutil.move(scroll, "../scrolls/" + basename(scroll))
+#for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
+#	shutil.move(scroll, "../scrolls/" + basename(scroll))
+
+
 #for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
 #	os.remove(garbage)
-for path in glob.glob("*.png"): os.remove(path)
+
+#for path in glob.glob("*.png"): os.remove(path)
 #for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
-beautify.beautify()
+
+#beautify.beautify()
+
 os.chdir("../panels")
 #beautify.beautify(start=0)
 
 for imagePath in glob.glob("*.png"):
-	indexParam = "_%02d"
-	scene = "-scene 1"
-	printAndRun(magick + "convert -crop 800x1200 " + scene + " " +  imagePath + " " + imagePath.split(".")[0] + indexParam + ".jpg")
-	niceCut = splitext(imagePath)[0].rsplit("_p", 1)
-	if int(niceCut[1]) == 1 and not os.path.isfile(niceCut[0] + "_" + str(int(niceCut[1])+1).zfill(2) + splitext(imagePath)[1]):
-		shutil.move(imagePath, niceCut[0] + splitext(imagePath)[1])
-		imagePath = niceCut[0] + splitext(imagePath)[1]
-		indexParam = ""
-		scene = ""
-		print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-	else: print("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
 	os.remove(imagePath)
+#for imagePath in glob.glob("*-[0-9].jpg"):
+#	shutil.move(imagePath, imagePath.replace("-", "_"))
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
