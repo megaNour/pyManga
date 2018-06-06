@@ -197,7 +197,7 @@ for imagePath in glob.glob("*.png"):
 	indexParam = "_%02d"
 	scene = "-scene 1"
 	printAndRun(magick + "convert -crop 800x1200 " + scene + " " +  imagePath + " " + imagePath.split(".")[0] + indexParam + ".jpg")
-	niceCut = splitext(imagePath)[0].rsplit("_", 1)
+	niceCut = splitext(imagePath)[0].rsplit("_p", 1)
 	if int(niceCut[1]) == 1 and not os.path.isfile(niceCut[0] + "_" + str(int(niceCut[1])+1).zfill(2) + splitext(imagePath)[1]):
 		shutil.move(imagePath, niceCut[0] + splitext(imagePath)[1])
 		imagePath = niceCut[0] + splitext(imagePath)[1]
