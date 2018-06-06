@@ -34,36 +34,57 @@ append = " " if not args.f else " -append "
 
 command = magick + "convert -colorspace sRGB -append " 
 
-def doMagick(doCopy=True, extraPath="../"):
-    auxCommand = command
-    global append
-    for path in sorted(glob.glob("*[0-9].png")):	
-        foot = marge = " "
-        if args.f:
-            foot = " " + str(footerPath) + " "
-            append = " -append "
-        if args.m:
-            marge = " " + str(marginPath) + " "
-        #if not manager.getPageNumber(path) > 1:
-        #       foot = marge = " "
-        if doCopy:
-            printAndRun(magick + "convert" + append + path + foot + extraPath + "../panels/" + path)
-        auxCommand += " " + basename(path) + marge
-    auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
-    auxCommand = re.sub("  +", " ", auxCommand)
-    if args.f: auxCommand += " " + str(footerPath) + " "
-    auxCommand += manager.getChapterName() + scrollSuffix
-    printAndRun(auxCommand)
+def doMagick():
+	auxCommand = command
+	global append
+	pngGlob = sorted(glob.glob("*.png"))
+	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG1")	
+	print(pngGlob)
+	targets = list()
+	if not args.p:
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG2")
+		print(pngGlob)
+		if os.path.isfile("../scribus/sequence.txt"):
+			print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG3")	
+			print(pngGlob)
+			file = open("../scribus/sequence.txt", "r")
+			args.p = file.readline().strip()
+			file.close()
+			targets = args.p.split()
+		else: targets = list(pngGlob)
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
+		print(targets)
+		targets = constants.getTargets(pngGlob, constants.listList(targets))
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
+		print(targets)
+	else:
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG5")	
+		print(args.p)
+		for sequence in args.p:		
+			targets.extend(constants.getTargets(pngGlob, constants.listString(sequence)))
+	for path in targets:
+		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
+		print(targets)
+		print(path)
+			#if not manager.getPageNumber(path) > 1:
+			#	   foot = marge = " "
+		printAndRun(magick + "convert" + append + path + foot + "../panels/" + path)
+		auxCommand += " " + basename(path) + marge
+	auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
+	auxCommand = re.sub("  +", " ", auxCommand)
+	if args.f: auxCommand += " " + str(footerPath) + " "
+	auxCommand += manager.getChapterName() + scrollSuffix
+	printAndRun(auxCommand)
 if args.F:
-    shutil.rmtree("../release", ignore_errors=True)
-    os.mkdir("../release")
+	shutil.rmtree("../release", ignore_errors=True)
+	os.mkdir("../release")
 
 else: 
-    os.chdir("../release")
-    for garbage in glob.glob("*"): 
-        if os.path.isfile(garbage): os.remove(garbage)
-	    #empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
-        elif not os.listdir(garbage): os.rmdir(garbage)
+	os.chdir("../release")
+	for garbage in glob.glob("*"): 
+		if os.path.isfile(garbage): os.remove(garbage)
+		#empty directories are a crash legacy that interfer with the script. If they are, we'll dispose them.
+		elif not os.listdir(garbage): os.rmdir(garbage)
 
 os.chdir("..")
 
@@ -76,9 +97,10 @@ os.chdir("scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
 #removing only the directories targeted.
 #We removed empty dirs and now dirs to be updated. So we keep the not empty dirs that don't need update
-for scroll in scrolls: 
-    shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
-    os.mkdir("../release/" + splitext(basename(scroll))[0])
+
+#for scroll in scrolls: 
+#	shutil.rmtree("../release/" + splitext(basename(scroll))[0], ignore_errors=True)
+#	os.mkdir("../release/" + splitext(basename(scroll))[0])
 
 print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 print(glob.glob("*.pdf"))
@@ -98,16 +120,17 @@ for pdf in targets:
 	match = constants.getIndexStart(fileName)
 	index = "1" if match is None else str(match.group(1))
 	
-	#subfolder = fileName + "/" # if len(targets) > 1 else ""
+	#printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
+	#+ os.path.abspath(pdf) + " ../release/" + fileShortName + "_%02d.png")
 	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
-	+ os.path.abspath(pdf) + " ../release/" + fileName + "/" + fileShortName + "_%02d.png")
-	#-crop 3036x4725+236+236 
+	+ pdf + " ../release/" + fileShortName + "p%02d.png")	
+
 
 	if not args.D:
 		os.remove(pdf)
 
 	#run (magick + "convert -size " + str(width) + "x" + str(margin) +" canvas:black margin.png")
-    
+	
 
 os.chdir("../release")
 
@@ -117,28 +140,42 @@ os.mkdir("../panels")
 marginPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "margin.png"
 footerPath = Path.cwd().parent.parent.absolute() / "generic" / "release" / "footer.png"
 
+foot = marge = " "
+if args.f:
+	foot = " " + str(footerPath) + " "
+	append = " -append "
+if args.m:
+	marge = " " + str(marginPath) + " "
+
 print("########################################")
 
 #beautify.beautify()
-
+"""
 listDir = [filtered for filtered in os.listdir(".") if os.path.isdir(filtered)]
 releaseDir = os.getcwd()
 print(listDir)
 for dirName in listDir:
-    os.chdir(dirName)	
-    print(os.getcwd())
-    doMagick("../")
-    for pngFile in glob.glob("*.png"):
-        shutil.copyfile(pngFile, "../" + pngFile) 
-    shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
-    os.chdir(releaseDir)
-
-doMagick(doCopy=False)
-
+	os.chdir(dirName)	
+	print(os.getcwd())
+	doMagick()
+	for pngFile in glob.glob("*.png"):
+		shutil.copyfile(pngFile, "../" + pngFile) 
+	shutil.move(manager.getChapterName() + scrollSuffix, dirName + scrollSuffix)
+	os.chdir(releaseDir)
+"""
+doMagick()
+print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
+print(os.getcwd())
+"""
+for sequence in args.p:
+	auxCommand = command
+	for image in constants.getTargets(glob.glob("*.png"), constants.listString(sequence))
+		auxCommand +=
+"""
 for scroll in (scroll for scroll in glob.glob("**/*" + scrollSuffix, recursive=True) if os.path.isfile(scroll)): 
-    shutil.move(scroll, "../scrolls/" + basename(scroll))
+	shutil.move(scroll, "../scrolls/" + basename(scroll))
 #for garbage in (garbage for garbage in glob.glob("*/*.jpg") if not garbage.endswith(scrollSuffix)):
-#    os.remove(garbage)
+#	os.remove(garbage)
 for path in glob.glob("*.png"): os.remove(path)
 #for path in glob.glob("*.jpg"): shutil.move(path, "../panels/" + path)
 beautify.beautify()
@@ -146,11 +183,15 @@ os.chdir("../panels")
 #beautify.beautify(start=0)
 
 for imagePath in glob.glob("*.png"):
-	niceCut = splitext(imagePath)[0].rsplit("_", 1)
+	niceCut = splitext(imagePath)[0].split("_p", 1)
+	indexParam = "_%02d"
+	scene = "-scene 1"
 	if int(niceCut[1]) == 1 and not os.path.isfile(niceCut[0] + "_" + str(int(niceCut[1])+1).zfill(2) + splitext(imagePath)[1]):
 		shutil.move(imagePath, niceCut[0] + splitext(imagePath)[1])
 		imagePath = niceCut[0] + splitext(imagePath)[1]
-	printAndRun(magick + "convert " + imagePath + " -crop 800x1200 -scene 1 " + imagePath.split(".")[0] + ".jpg")
+		indexParam = ""
+		scene = ""
+	printAndRun(magick + "convert " + imagePath + " -crop 800x1200 " + scene + " " + imagePath.split(".")[0] + indexParam + ".jpg")
 	os.remove(imagePath)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
