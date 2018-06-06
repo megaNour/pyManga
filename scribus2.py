@@ -10,6 +10,7 @@ import argparse
 #import shutil
 from pathlib import Path
 import re
+import sys
 
 manager = Manager("..")
 name = manager.getChapterName()
@@ -25,10 +26,19 @@ args, unknown = parser.parse_known_args()
 
 pagesArgs = ""
 if args.p:
-    pagesArgs = " -p " + ",".join(args.p)
+    pagesArgs = "p:" + ",".join(args.p)
     pagesArgs = constants.zfillParamString(pagesArgs, 2)
 
 parent = os.getcwd()
 
-printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + "pdf2.py"  
-+ " -n " + name + " -d " + parent + pagesArgs) 
+sys.argv.append("-s")
+sys.argv.append("pdf2.py")
+
+sys.argv.append("-n")
+sys.argv.append(name)
+
+if args.p:
+	sys.argv.append("-a")
+	sys.argv.append(pagesArgs)
+
+import scribus3
