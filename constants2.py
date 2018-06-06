@@ -2,8 +2,8 @@ from subprocess import call
 import os
 import re
 
-INDEXED_FILENAME_PATTERN="\D(\d+)\.(\w+)$"
-INDEXED_SCROLL_PATTERN="\D(\d+)(-(\d+))?(\.\w*)?$"
+INDEXED_FILENAME_PATTERN="_p([\d_-]+)\.(\w+~?)$"
+INDEXED_SCROLL_PATTERN="_p(\d+)(-(\d+))?(\.\w*)?$"
 patternFile = re.compile(INDEXED_FILENAME_PATTERN)
 patternScroll = re.compile(INDEXED_SCROLL_PATTERN)
 def printAndRun(command):
@@ -29,6 +29,10 @@ def getFileNameIndexAndExtention(fileName):
 
 def getTargets(possibleTargets, pointers):
 	targets = list(possibleTargets)
+	#print(possibleTargets)
+	#for scroll in possibleTargets:
+	#	print(getFileNameIndexAndExtention(scroll))
+	#print(pointers)
 	if pointers is not None: 
 		targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in [zfillParamString(str(param), 2) for param in pointers]]
 	return targets

@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import constants2 as constants
-import beautify
 from constants2 import printAndRun
 import glob
 import zipfile
@@ -36,7 +35,6 @@ command = magick + "convert -colorspace sRGB -append "
 
 def doMagick():
 	auxCommand = command
-	global append, foot, marge
 	pngGlob = sorted(glob.glob("*.png"))
 	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG1")	
 	print(pngGlob)
@@ -64,8 +62,9 @@ def doMagick():
 	else:
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG5")	
 		print(args.p)
+		targets = []
 		for sequence in args.p:		
-			targets = (constants.getTargets(pngGlob, constants.listString(sequence)))
+			targets.append(constants.getTargets(pngGlob, constants.listString(sequence)))
 	scrollIndex = 0
 	for path in targets:
 		scrollIndex += 1
@@ -73,18 +72,18 @@ def doMagick():
 		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
 		print(targets)
 		print(path)
-		if not int(manager.getPageNumber(path[0])) > 1:
-			foot = marge = " "
 		for fragment in path:
 			printAndRun(magick + "convert" + append + fragment + foot + "../panels/" + fragment)
 			auxCommand += " " + basename(fragment) + marge
 		auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
 		auxCommand = re.sub("  +", " ", auxCommand)
+		auxCommand = auxCommand.replace(marge, " ", 1)
 		if args.f: auxCommand += " " + str(footerPath) + " "
 		auxCommand += "../scrolls/" + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + str(scrollIndex).zfill(2) + splitext(scrollSuffix)[1]
 		printAndRun(auxCommand)
 	bigScroll = glob.glob("*.png")
-	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls" + manager.getChapterName() + scrollSuffix
+	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
+	auxCommand = auxCommand.replace(marge, " ", 1)
 	printAndRun(auxCommand)
 
 if args.F:
@@ -114,7 +113,7 @@ for pdf in targets:
 	index = "1" if match is None else str(match.group(1))
 
 	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
-	+ pdf + " ../release/" + fileShortName + "p%02d.png")	
+	+ pdf + " ../release/" + fileShortName + "_p%02d.png")	
 
 	if not args.D:
 		os.remove(pdf)

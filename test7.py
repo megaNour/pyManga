@@ -15,12 +15,10 @@ parser.add_argument("-w", help="page width ?")
 parser.add_argument("-D", action="store_true", help="spare base pdf flag")
 parser.add_argument("-F", action="store_true", help="flush release folder from old cache")
 
-magick = "" if os.name != "nt" else "magick.exe "
+args, unknown = parser.parse_known_args()
 
-
-for imagePath in glob.glob("*.jpg"):
-	print(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".png")
-	run(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".png")
-	os.remove(imagePath)
+targets = constants.getTargets(glob.glob("*.pdf"), args.p)
 #for imagePath in glob.glob("*-[0-9].png"):
 #	shutil.move(imagePath, imagePath.replace("-", "_"))
+
+print(targets)
