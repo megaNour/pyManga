@@ -14,8 +14,8 @@ args, unknown = parser.parse_known_args()
 
 
 for entry in glob.glob("*.py"):
-    print(entry)
-    print(type(entry))
+	print(entry)
+	print(type(entry))
 
 """
 entries = ["1", "2", "3", "5-8", "12", "10"]

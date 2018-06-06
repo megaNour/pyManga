@@ -18,16 +18,16 @@ args, unknown = parser.parse_known_args()
 #sys.argv[1] = "coucou"
 #print(sys.argv[1])
 #print(len(sys.argv))
-    
+	
 chapNum = 1
 chapter = "chapitre_"
 p = re.compile("(?<!_)_(\d+)(_.+)?")
 for s in os.listdir():
-    m = p.search(s)
-    if m:
-        result = int(m.group(1))
-        if not result < chapNum:
-            chapNum = result + 1
+	m = p.search(s)
+	if m:
+		result = int(m.group(1))
+		if not result < chapNum:
+			chapNum = result + 1
 index = str(chapNum).zfill(3)
 chapterName = chapter + index
 chapterName = chapterName + "_" + args.t if args.t else chapterName

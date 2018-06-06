@@ -22,12 +22,12 @@ args, unknown = parser.parse_known_args()
 
 pagesArgs = ""
 if args.p:
-    pagesArgs = " -p " + ",".join(args.p)
+	pagesArgs = " -p " + ",".join(args.p)
 
 scrollsArgs = " -s " + ",".join(glob.glob("*.sla"))
 if args.s:
-    targets = constants.getTargets(glob.glob("*.sla"), args.s)
-    scrollsArgs = " -s " + ",".join(targets)
+	targets = constants.getTargets(glob.glob("*.sla"), args.s)
+	scrollsArgs = " -s " + ",".join(targets)
 
 parent = Path.cwd().absolute()
 

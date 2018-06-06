@@ -22,31 +22,31 @@ args, unknown = parser.parse_known_args()
 #for Webtoonify
 
 #if args.p:
-#    sys.argv.extend(args.p)
+#	sys.argv.extend(args.p)
 
 if not args.P:
-    flag = -1
-    i = 1
-    for arg in sys.argv[i:len(sys.argv)]:
-        if sys.argv[i].startswith("-"): 
-            flag = i
-            print("flag at " + str(i))
-            del sys.argv[flag:]
-            break
-        i += 1
-    os.chdir("kra")
-    import produce
-    os.chdir("..")
+	flag = -1
+	i = 1
+	for arg in sys.argv[i:len(sys.argv)]:
+		if sys.argv[i].startswith("-"): 
+			flag = i
+			print("flag at " + str(i))
+			del sys.argv[flag:]
+			break
+		i += 1
+	os.chdir("kra")
+	import produce
+	os.chdir("..")
 
 os.chdir("scribus")
 import scribus
 
 if args.D:
-    sys.argv.append("-D")
-    sys.argv.append("True")
+	sys.argv.append("-D")
+	sys.argv.append("True")
 
 import webtoonify
-                
+				
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
 

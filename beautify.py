@@ -7,6 +7,7 @@ import shutil
 import argparse
 from manager import Manager
 from pathlib import Path
+import sys
 
 manager = Manager("..")
 
@@ -24,31 +25,54 @@ def rename(swapNamePrefix, globExpr):
 			start += step
 		else :
 			print(path + " doesn't comply to the patern")
-	return target
+	return targets
 
+def swapExtention(old: str, new: str, items: list):
+	return [re.sub("\." + old + "$", "." + new, item) for item in items] 
+	
 def beautify():
-	target = rename(beautifulPrefix, "*.kra")
+	before = rename(beautifulPrefix, "*.kra")
 	rename(beautifulPrefix, "*.kra~")
 	rename("", "*.kra")
 	rename("", "*.kra~")
-	if target != glob.glob("*.kra")
-
+	after = glob.glob("*.kra")
+#if before != after:
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!you need beautification!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	#before = "b:" + ",".join(swapExtention("kra", "png", before))
+	#after = "a:" + ",".join(swapExtention("kra", "png", after))
 	
-'''
-parser = argparse.ArgumentParser()
-parser.add_argument("--pattern", nargs="?", help="pattern to target")
-parser.add_argument("--start", nargs="?", help="index start for renamed files")
-parser.add_argument("--step", nargs="?", help="increment step for renamed files")
-parser.add_argument("--name", nargs="?", help="increment step for renamed files")
+	before = swapExtention("kra", "png", before)
+	after = swapExtention("kra", "png", after)
+	'''
+	sys.argv.append("-s")
+	sys.argv.append("beautifulScribus.py")
 
-args, unknown = parser.parse_known_args()
+	sys.argv.append("-a")
+	sys.argv.append(before)
+	sys.argv.append(after)
 
-pattern = args.pattern if args.pattern else constants.INDEXED_FILENAME_PATTERN
-start = int(args.start) if args.start else 1
-step = int(args.step) if args.step else 1
-newNameSuffix = args.name if args.name else "managerInfered"
-'''
+	os.chdir("../scribus")
+
+	import scribus3
+	'''	
+	os.chdir("../scribus")
+	for sla in glob.glob("*.sla"):
+		file = open(sla, "r")
+		xml = file.read()
+		file.close()
+		
+		index = 0
+		for adress in before:
+			xml = xml.replace(before[index], after[index])
+			index += 1 
+		
+		file = open(sla,"w")
+		file.write(xml)
+		file.close()
+
+# ####################################################################################
 beautifulPrefix = "beautiful_"
-
 beautify()
 
