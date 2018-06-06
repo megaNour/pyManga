@@ -12,17 +12,16 @@ import sys
 manager = Manager("..")
 
 def rename(swapNamePrefix, globExpr):
-	#start becomes the index
-	start = step = 1
+	index = step = 1
 	targets = sorted(glob.glob(globExpr))
 	pattern = re.compile(constants.INDEXED_FILENAME_PATTERN)
 	for path in (path for path in targets if os.path.isfile(path)):
 		matcher = pattern.search(path)
 		if matcher:		
-			newName = manager.getPageName(start, matcher.group(2))				
+			newName = manager.getPageName(index, matcher.group(2))				
 			newPath = swapNamePrefix + newName
 			shutil.move(path, newPath)
-			start += step
+			index += step
 		else :
 			print(path + " doesn't comply to the patern")
 	return targets
@@ -37,26 +36,14 @@ def beautify():
 	rename("", "*.kra~")
 	after = glob.glob("*.kra")
 #if before != after:
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("!!!!!!!!!!!!!!you need beautification!!!!!!!!!!!!!!")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!!!!!!beautification!!!!!!!!!!!!!!!!!!!")
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	#before = "b:" + ",".join(swapExtention("kra", "png", before))
 	#after = "a:" + ",".join(swapExtention("kra", "png", after))
-	
 	before = swapExtention("kra", "png", before)
 	after = swapExtention("kra", "png", after)
-	'''
-	sys.argv.append("-s")
-	sys.argv.append("beautifulScribus.py")
 
-	sys.argv.append("-a")
-	sys.argv.append(before)
-	sys.argv.append(after)
-
-	os.chdir("../scribus")
-
-	import scribus3
-	'''	
 	os.chdir("../scribus")
 	for sla in glob.glob("*.sla"):
 		file = open(sla, "r")
