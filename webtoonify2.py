@@ -45,8 +45,7 @@ def findWidestRange(listString):
 
 def getDefaultSequence(globTarget):
 	targets = None
-	if os.path.exists("../scribus/sequence.txt"):
-		print("______________1")
+	if os.path.isfile("../scribus/sequence.txt"):
 		file = open("../scribus/sequence.txt", "r")
 		targetsString = file.readline().strip()
 		file.close()
@@ -85,17 +84,11 @@ def doMagick():
 	targets = None
 	targets = getDefaultSequence(pngGlob)
 	snapshots = []
-	print(targets)
-	print("###########1")
 	makeScrolls(targets)
 	#targets = [[target] for target in targets[0]]
 	if args.p:
 		for sequence in args.p:
-			print("###########2")
-			print(sequence)
 			snapshots.append(constants.getTargets(pngGlob, constants.listString(sequence)))
-		print("###########3")
-		print(snapshots)
 		makeScrolls(snapshots, "snapshots/")
 	bigScroll = sorted(glob.glob("*.png"))
 	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
