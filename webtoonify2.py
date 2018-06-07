@@ -51,14 +51,15 @@ def getDefaultSequence(globTarget):
 		targetsString = file.readline().strip()
 		file.close()
 		targets = targetsString.split()
-	else:
+	elif not args.p:
 		os.chdir("../kra")
 		targets = [findWidestRange(constants.getFileNameIndexAndExtention(path)[0] for path in glob.glob("*.kra"))]
 		os.chdir("../release")
 		allDone = True
 	scrollTargets = list()
-	for scrollString in targets:
-		scrollTargets.append(constants.getTargets(globTarget, constants.listString(scrollString)))
+	if targets:
+		for scrollString in targets:
+			scrollTargets.append(constants.getTargets(globTarget, constants.listString(scrollString)))
 	return list(scrollTargets), allDone
 
 def makeScrolls(targets, extraPath=""):
@@ -86,8 +87,7 @@ def doMagick():
 	targets = None
 	targets, allDone = getDefaultSequence(pngGlob)
 	snapshots = []
-	makeScrolls(targets)
-	#targets = [[target] for target in targets[0]]
+	if targets:	makeScrolls(targets)
 	if args.p:
 		for sequence in args.p:
 			snapshots.append(constants.getTargets(pngGlob, constants.listString(sequence)))
@@ -104,17 +104,14 @@ def doMagick():
 		print("moved: " + scrollWithUsellRange + " to " + mainScrollPath)
 		print("define a sequence.txt in your scribus subfolder to define the range of subscrolls based on your sla file")
 		
-
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
 	os.mkdir("../release")
 
 os.chdir("..")
 
-#cleaning
 shutil.rmtree("scrolls", ignore_errors=True)
 shutil.rmtree("panels", ignore_errors=True)
-
 
 os.chdir("scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
@@ -154,11 +151,6 @@ os.chdir("../panels")
 for imagePath in glob.glob("*.png"):
 	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
 	os.remove(imagePath)
-
-#import pyManga.beautify
-
-#for imagePath in glob.glob("*-[0-9].jpg"):
-#	shutil.move(imagePath, imagePath.replace("-", "_"))
-
+	
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 
