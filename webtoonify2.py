@@ -45,7 +45,8 @@ def findWidestRange(listString):
 
 def getDefaultSequence(globTarget):
 	targets = None
-	if os.path.isfile("../scribus/sequence.txt"):
+	if os.path.exists("../scribus/sequence.txt"):
+		print("______________1")
 		file = open("../scribus/sequence.txt", "r")
 		targetsString = file.readline().strip()
 		file.close()
@@ -59,7 +60,7 @@ def getDefaultSequence(globTarget):
 		scrollTargets.append(constants.getTargets(globTarget, constants.listString(scrollString)))
 	return list(scrollTargets)
 
-def makeScrolls(targets, extraPath="", doCopy=True):
+def makeScrolls(targets, extraPath=""):
 	scrollIndex = 0
 	if len(extraPath):	os.mkdir("../scrolls/" + extraPath)
 	for rangeStr in targets:
@@ -67,10 +68,9 @@ def makeScrolls(targets, extraPath="", doCopy=True):
 			auxCommand = command
 			print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
 			for panel in rangeStr:
-				if doCopy:
-					export = magick + "convert" + append + panel + foot + "../panels/" + panel
-					if int(manager.getPageNumber(panel)) == 1: export = export.replace(foot, " ")
-					printAndRun(export)
+				export = magick + "convert" + append + panel + foot + "../panels/" + panel
+				if int(manager.getPageNumber(panel)) == 1: export = export.replace(foot, " ")
+				printAndRun(export)
 				auxCommand += " " + basename(panel) + marge
 			auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
 			auxCommand = re.sub("  +", " ", auxCommand)
@@ -85,12 +85,17 @@ def doMagick():
 	targets = None
 	targets = getDefaultSequence(pngGlob)
 	snapshots = []
+	print(targets)
+	print("###########1")
 	makeScrolls(targets)
 	#targets = [[target] for target in targets[0]]
-	#makeScrolls(targets, doCopy=False)
 	if args.p:
 		for sequence in args.p:
+			print("###########2")
+			print(sequence)
 			snapshots.append(constants.getTargets(pngGlob, constants.listString(sequence)))
+		print("###########3")
+		print(snapshots)
 		makeScrolls(snapshots, "snapshots/")
 	bigScroll = sorted(glob.glob("*.png"))
 	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
