@@ -45,6 +45,7 @@ def findWidestRange(listString):
 
 def getDefaultSequence(globTarget):
 	targets = None
+	allDone = False
 	if os.path.isfile("../scribus/sequence.txt"):
 		file = open("../scribus/sequence.txt", "r")
 		targetsString = file.readline().strip()
@@ -54,10 +55,11 @@ def getDefaultSequence(globTarget):
 		os.chdir("../kra")
 		targets = [findWidestRange(constants.getFileNameIndexAndExtention(path)[0] for path in glob.glob("*.kra"))]
 		os.chdir("../release")
+		allDone = True
 	scrollTargets = list()
 	for scrollString in targets:
 		scrollTargets.append(constants.getTargets(globTarget, constants.listString(scrollString)))
-	return list(scrollTargets)
+	return list(scrollTargets), allDone
 
 def makeScrolls(targets, extraPath=""):
 	scrollIndex = 0
@@ -82,7 +84,7 @@ def doMagick():
 	auxCommand = command
 	pngGlob = sorted(glob.glob("*.png"))
 	targets = None
-	targets = getDefaultSequence(pngGlob)
+	targets, allDone = getDefaultSequence(pngGlob)
 	snapshots = []
 	makeScrolls(targets)
 	#targets = [[target] for target in targets[0]]
@@ -90,10 +92,18 @@ def doMagick():
 		for sequence in args.p:
 			snapshots.append(constants.getTargets(pngGlob, constants.listString(sequence)))
 		makeScrolls(snapshots, "snapshots/")
-	bigScroll = sorted(glob.glob("*.png"))
-	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
-	auxCommand = auxCommand.replace(marge, " ", 1)
-	printAndRun(auxCommand)
+	mainScrollPath = "../scrolls/" + manager.getChapterName() + scrollSuffix
+	if not allDone:
+		bigScroll = sorted(glob.glob("*.png"))
+		auxCommand = command + marge.join(bigScroll).strip() + foot + mainScrollPath
+		auxCommand = auxCommand.replace(marge, " ", 1)
+		printAndRun(auxCommand)
+	else:
+		scrollWithUsellRange = os.listdir("../scrolls")[0]
+		shutil.move("../scrolls/" + scrollWithUsellRange, mainScrollPath)
+		print("moved: " + scrollWithUsellRange + " to " + mainScrollPath)
+		print("define a sequence.txt in your scribus subfolder to define the range of subscrolls based on your sla file")
+		
 
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
