@@ -12,9 +12,9 @@ def printAndRun(command):
 
 def listString(listString, splitter=","):
 	return listList(listString.split(splitter))
-	
+
 def listList(entries):
-	result = []	
+	result = []
 	for entry in entries:
 		entry = str(entry)
 		if "-" in entry:
@@ -33,7 +33,7 @@ def getTargets(possibleTargets, pointers):
 	#for scroll in possibleTargets:
 	#	print(getFileNameIndexAndExtention(scroll))
 	#print(pointers)
-	if pointers is not None: 
+	if pointers is not None:
 		targets = [scroll for scroll in possibleTargets if getFileNameIndexAndExtention(scroll)[0] in [zfillParamString(str(param), 2) for param in pointers]]
 	return targets
 
@@ -43,6 +43,6 @@ def zfillParamString(paramString, zeroes):
 def getIndexStart(name):
 	matcher = patternScroll.search(name)
 	return matcher
-	
+
 def removeRange(name):
 	return re.split(INDEXED_SCROLL_PATTERN, name)[0]

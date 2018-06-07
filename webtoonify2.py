@@ -1,6 +1,7 @@
 #!/usr/bin/python3
-import constants2 as constants
-from constants2 import printAndRun
+import pyManga.constants2 as constants
+from pyManga.constants2 import printAndRun
+from pyManga.manager import Manager
 import glob
 import zipfile
 import os
@@ -8,7 +9,7 @@ import time
 import sys
 import re
 import argparse
-from manager import Manager
+
 from os.path import basename, splitext
 from pathlib import Path
 import shutil
@@ -31,55 +32,66 @@ scrollSuffix = "_scroll.jpg"
 magick = "" if os.name != "nt" else "magick "
 append = " " if not args.f else " -append "
 
-command = magick + "convert -colorspace sRGB -append " 
+command = magick + "convert -colorspace sRGB -append "
+
+def findWidestRange(listString):
+	flat = " ".join(listString)
+	biggest = smallest = None
+	pattern = re.compile("(\d+)")
+	for x in (int(x) for x in re.findall("(\d+)", flat)):
+		biggest = x if biggest is None else x if x > biggest else biggest
+		smallest = x if smallest is None else x if x < smallest else smallest
+	return str(smallest) + "-" + str(biggest)
+
+def getDefaultSequence(globTarget):
+	targets = None
+	if os.path.isfile("../scribus/sequence.txt"):
+		file = open("../scribus/sequence.txt", "r")
+		targetsString = file.readline().strip()
+		file.close()
+		targets = targetsString.split()
+	else:
+		os.chdir("../kra")
+		targets = [findWidestRange(constants.getFileNameIndexAndExtention(path)[0] for path in glob.glob("*.kra"))]
+		os.chdir("../release")
+	scrollTargets = list()
+	for scrollString in targets:
+		scrollTargets.append(constants.getTargets(globTarget, constants.listString(scrollString)))
+	return list(scrollTargets)
+
+def makeScrolls(targets, extraPath="", doCopy=True):
+	scrollIndex = 0
+	if len(extraPath):	os.mkdir("../scrolls/" + extraPath)
+	for rangeStr in targets:
+			scrollIndex += 1
+			auxCommand = command
+			print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
+			for panel in rangeStr:
+				if doCopy:
+					export = magick + "convert" + append + panel + foot + "../panels/" + panel
+					if int(manager.getPageNumber(panel)) == 1: export = export.replace(foot, " ")
+					printAndRun(export)
+				auxCommand += " " + basename(panel) + marge
+			auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
+			auxCommand = re.sub("  +", " ", auxCommand)
+			auxCommand = auxCommand.replace(marge, " ", 1)
+			if args.f: auxCommand += " " + str(footerPath) + " "
+			auxCommand += "../scrolls/" + extraPath  + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + constants.zfillParamString(findWidestRange([constants.getFileNameIndexAndExtention(path)[0] for path in rangeStr]), 2) + splitext(scrollSuffix)[1]
+			printAndRun(auxCommand)
 
 def doMagick():
 	auxCommand = command
 	pngGlob = sorted(glob.glob("*.png"))
-	print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG1")	
-	print(pngGlob)
 	targets = None
-	if not args.p:
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG2")
-		print(pngGlob)
-		if os.path.isfile("../scribus/sequence.txt"):
-			print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG3")	
-			print(pngGlob)
-			file = open("../scribus/sequence.txt", "r")
-			args.p = file.readline().strip()
-			file.close()
-			targets = args.p.split()
-		else: targets = list(pngGlob)
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG4")	
-		scrollTargets = list()
-		for scrollString in targets:
-			scrollTargets.append(constants.getTargets(pngGlob, constants.listString(scrollString)))
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG7")	
-		print(scrollTargets)
-		targets = list(scrollTargets)
-	else:
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG5")	
-		print(args.p)
-		targets = []
-		for sequence in args.p:		
-			targets.append(constants.getTargets(pngGlob, constants.listString(sequence)))
-	scrollIndex = 0
-	for path in targets:
-		scrollIndex += 1
-		auxCommand = command
-		print("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG6")	
-		print(path)
-		for fragment in path:
-			export = magick + "convert" + append + fragment + foot + "../panels/" + fragment
-			if int(manager.getPageNumber(fragment)) == 1: export = export.replace(foot, " ")
-			printAndRun(export)
-			auxCommand += " " + basename(fragment) + marge
-		auxCommand = re.sub(" " + str(marginPath).replace("\\", "/") + " $", "", auxCommand)
-		auxCommand = re.sub("  +", " ", auxCommand)
-		auxCommand = auxCommand.replace(marge, " ", 1)
-		if args.f: auxCommand += " " + str(footerPath) + " "
-		auxCommand += "../scrolls/" + manager.getChapterName() + splitext(scrollSuffix)[0] + "_" + str(scrollIndex).zfill(2) + splitext(scrollSuffix)[1]
-		printAndRun(auxCommand)
+	targets = getDefaultSequence(pngGlob)
+	snapshots = []
+	makeScrolls(targets)
+	#targets = [[target] for target in targets[0]]
+	#makeScrolls(targets, doCopy=False)
+	if args.p:
+		for sequence in args.p:
+			snapshots.append(constants.getTargets(pngGlob, constants.listString(sequence)))
+		makeScrolls(snapshots, "snapshots/")
 	bigScroll = sorted(glob.glob("*.png"))
 	auxCommand = command + marge.join(bigScroll).strip() + foot + "../scrolls/" + manager.getChapterName() + scrollSuffix
 	auxCommand = auxCommand.replace(marge, " ", 1)
@@ -91,7 +103,7 @@ if args.F:
 
 os.chdir("..")
 
-#cleaning	
+#cleaning
 shutil.rmtree("scrolls", ignore_errors=True)
 shutil.rmtree("panels", ignore_errors=True)
 
@@ -99,20 +111,15 @@ shutil.rmtree("panels", ignore_errors=True)
 os.chdir("scribus")
 scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
 
-print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-print(glob.glob("*.pdf"))
-print("###############")
 targets = constants.getTargets(glob.glob("*.pdf"), args.p)
-print(targets)
 for pdf in targets:
 	fileName = splitext(basename(pdf))[0]
 	fileShortName = constants.removeRange(fileName)
-	print(pdf)
 	match = constants.getIndexStart(fileName)
 	index = "1" if match is None else str(match.group(1))
 
-	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " " 
-	+ pdf + " ../release/" + manager.getChapterName() + "_p%02d.png")	
+	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " "
+	+ pdf + " ../release/" + manager.getChapterName() + "_p%02d.png")
 
 	if not args.D:
 		os.remove(pdf)
@@ -132,11 +139,8 @@ if args.f:
 if args.m:
 	marge = " " + str(marginPath) + " "
 
-print("########################################")
 doMagick()
-print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\")
 
-print(os.getcwd())
 os.chdir("../panels")
 
 for imagePath in glob.glob("*.png"):
@@ -149,5 +153,4 @@ for imagePath in glob.glob("*.png"):
 #	shutil.move(imagePath, imagePath.replace("-", "_"))
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
-
 
