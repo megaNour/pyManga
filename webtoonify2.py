@@ -22,6 +22,7 @@ parser.add_argument("-p", nargs="*", help="scribus pdf scrolls to be released as
 parser.add_argument("-w", help="page width ?")
 parser.add_argument("-D", action="store_true", help="spare base pdf flag")
 parser.add_argument("-F", action="store_true", help="flush release folder from old cache")
+parser.add_argument("-S", action="store_true", help="Ignore your scribus/sequence.txt, because...you can")
 
 args, unknown = parser.parse_known_args()
 
@@ -46,7 +47,7 @@ def findWidestRange(listString):
 def getDefaultSequence(globTarget):
 	targets = None
 	allDone = False
-	if os.path.isfile("../scribus/sequence.txt"):
+	if os.path.isfile("../scribus/sequence.txt") and not args.S:
 		file = open("../scribus/sequence.txt", "r")
 		targetsString = file.readline().strip()
 		file.close()
@@ -101,8 +102,12 @@ def doMagick():
 	else:
 		scrollWithUsellRange = os.listdir("../scrolls")[0]
 		shutil.move("../scrolls/" + scrollWithUsellRange, mainScrollPath)
+		print("########################################################################################################")
+		print("########################################################################################################")
 		print("moved: " + scrollWithUsellRange + " to " + mainScrollPath)
 		print("define a sequence.txt in your scribus subfolder to define the range of subscrolls based on your sla file")
+		print("########################################################################################################")
+		print("########################################################################################################")
 		
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
