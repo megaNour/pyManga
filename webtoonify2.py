@@ -120,7 +120,7 @@ shutil.rmtree("panels", ignore_errors=True)
 
 os.chdir("scribus")
 
-targets = constants.getTargets(glob.glob(manager.getChapterName() + "*.pdf"), args.p)
+targets = constants.getTargets(glob.glob("*.pdf"), args.p)
 for pdf in targets:
 	fileName = splitext(basename(pdf))[0]
 	fileShortName = constants.removeRange(fileName)

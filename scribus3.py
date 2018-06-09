@@ -28,8 +28,6 @@ parent = os.getcwd()
 
 additionalArgs = ""
 if args.a:
-	print("scribus3 got -a 88888888888888888888888888888888888888888888888")
-	print(args.a)
 	for argString in args.a:
 		split = argString.split(":")
 		flag = "-" + split[0]

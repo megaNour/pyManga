@@ -36,8 +36,6 @@ def swapExtention(old: str, new: str, items: list):
 	return [re.sub("\." + old + "$", "." + new, item) for item in items]
 
 def swapXml(xml, targets, prefix):
-	print(targets)
-	print(prefix + "777777777777777777777777777777777777777777777777")
 	index = 1
 	for adress in targets:
 		print("replacing: " + splitext(adress)[0] + " by: " + prefix + manager.getPageName(index))
