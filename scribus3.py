@@ -10,6 +10,7 @@ import argparse
 #import shutil
 from pathlib import Path
 import re
+import sys
 
 scribusScriptsPath = os.environ["SCRIBUSSCRIPTSPATH"] + "/"
 scribus = "scribusNour.AppImage" if os.name !="nt" else "\"" + os.environ["SCRIBUSPATH"] + "/Scribus.exe" + "\""
@@ -21,19 +22,23 @@ parser.add_argument("-a", nargs="*", help="additional arguments for -p you do p:
 args, unknown = parser.parse_known_args()
 #args.D is defined in Webtoonify.py
 
+print(sys.argv)
+
 parent = os.getcwd()
 
 additionalArgs = ""
 if args.a:
+	print("scribus3 got -a 88888888888888888888888888888888888888888888888")
+	print(args.a)
 	for argString in args.a:
 		split = argString.split(":")
 		flag = "-" + split[0]
 		arguments = " ".join(split[1].split(","))
 		argument = " " + flag + " " + arguments
 		print("injecting argument: " + argument)
-		additionalArgs += argument 
+		additionalArgs += argument
 		additionalArgs = additionalArgs.rstrip()
-		
 
-printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + args.s  
-+ " -d " + parent + additionalArgs) 
+
+printAndRun(scribus + " -g -ns -py " + scribusScriptsPath  + args.s
++ " -d " + parent + additionalArgs)

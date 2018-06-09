@@ -9,44 +9,59 @@ import re
 from os.path import basename, splitext
 import shutil
 from subprocess import run
+import argparse
+from os.path import basename, splitext
+import shutil
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-p", nargs="*", help="pages to be released >>> FROM ALL SCRIBUS SCROLLS <<<, accept x, y, x-z...")
+
+args, unknown = parser.parse_known_args()
+
 start = time.time()
 
 def produceFile(filePath):
-    baseName = (splitext(basename(filePath))[0])
-    print(baseName + " ### Production")
-    zipfile.ZipFile(filePath, "r").extract("mergedimage.png")
-    #run([magick, "convert", "-resize", "800", "-density", "300", "mergedimage.png", "../jpg/" + baseName + ".jpg"], shell=True)
-    printAndRun(magick + "convert -resize 800 -density 300 mergedimage.png ../jpg/" + baseName + ".jpg")
-    print("JPG => OK")
-    shutil.move("mergedimage.png", "../png/" + baseName + ".png")
-    print("PNG => OK")
+	baseName = (splitext(basename(filePath))[0])
+	print(baseName + " ### Production")
+	zipfile.ZipFile(filePath, "r").extract("mergedimage.png")
+	#run([magick, "convert", "-resize", "800", "-density", "300", "mergedimage.png", "../jpg/" + baseName + ".jpg"], shell=True)
+	printAndRun(magick + "convert -resize 800 -density 300 mergedimage.png ../jpg/" + baseName + ".jpg")
+	print("JPG => OK")
+	shutil.move("mergedimage.png", "../png/" + baseName + ".png")
+	print("PNG => OK")
 
 def findAndProduce(fileIndex):
-    f = glob.glob("./*_p" + fileIndex.zfill(2) + ".kra")
-    if f:
-        print(f)
-        produceFile(f[0])
+	f = glob.glob("./*_p" + fileIndex.zfill(2) + ".kra")
+	if f:
+		print(f)
+		produceFile(f[0])
+
+def produceList(listRanges):
+	for s in listRanges:
+		if "-" not in s:
+			findAndProduce(s)
+		elif not s.startswith("-") :
+			split = s.split("-")
+			for i in range(int(split[0]), int(split[1])+1):
+				findAndProduce(str(i))
 
 os.makedirs("../jpg/", exist_ok=True)
 os.makedirs("../png/", exist_ok=True)
 magick = "" if os.name != "nt" else "magick "
 
 #Batch <= because no specific file indicated
-if len(sys.argv) == 1 :
-    print(sys.argv)
-    print(len(sys.argv))
-    for f in sorted(glob.glob("./*[0-9].kra")):
-        print(f)
-        produceFile(f)
-else:
-    for s in sys.argv[1:len(sys.argv)]:
-        if("-" not in s):
-            findAndProduce(s)
-        else:
-            split = s.split("-")
-            for i in range(int(split[0]), int(split[1])+1):
-                findAndProduce(str(i))
-                
-print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
+args.p = args.p if args.p else sys.argv[1:]
+if args.p:
+	print("1111111111111")
+	print(args.p)
+	for s in args.p : produceList(s)
+else :
+	for f in sorted(glob.glob("./*[0-9].kra")):
+		print(f)
+		produceFile(f)
 
+
+
+
+print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 

@@ -18,7 +18,6 @@ parser.add_argument("-D", action="store_true", help="spare base pdf flag")
 parser.add_argument("-F", action="store_true", help="flush release folder from old cache")
 parser.add_argument("-N", action="store_true", help="Skip pdf export, debug purpose")
 
-
 args, unknown = parser.parse_known_args()
 #for Webtoonify
 
@@ -31,9 +30,9 @@ if not args.P:
 	for arg in sys.argv[i:len(sys.argv)]:
 		if sys.argv[i].startswith("-"):
 			flag = i
-			print("flag at " + str(i))
-			del sys.argv[flag:]
-			break
+			#print("flag at " + str(i))
+			#del sys.argv[:flag]
+			#break
 		i += 1
 	os.chdir("kra")
 	import produce
@@ -41,6 +40,8 @@ if not args.P:
 
 os.chdir("scribus")
 print("9999999999999999999999999")
+print(args.p)
+print(sys.argv)
 if not args.D:
 	for pdf in glob.glob("*.pdf"): os.remove(pdf)
 

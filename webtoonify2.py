@@ -108,7 +108,7 @@ def doMagick():
 		print("define a sequence.txt in your scribus subfolder to define the range of subscrolls based on your sla file")
 		print("########################################################################################################")
 		print("########################################################################################################")
-		
+
 if args.F:
 	shutil.rmtree("../release", ignore_errors=True)
 	os.mkdir("../release")
@@ -119,9 +119,8 @@ shutil.rmtree("scrolls", ignore_errors=True)
 shutil.rmtree("panels", ignore_errors=True)
 
 os.chdir("scribus")
-scrolls = constants.getTargets(glob.glob("*.pdf"), args.p)
 
-targets = constants.getTargets(glob.glob("*.pdf"), args.p)
+targets = constants.getTargets(glob.glob(manager.getChapterName() + "*.pdf"), args.p)
 for pdf in targets:
 	fileName = splitext(basename(pdf))[0]
 	fileShortName = constants.removeRange(fileName)
@@ -156,6 +155,6 @@ os.chdir("../panels")
 for imagePath in glob.glob("*.png"):
 	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
 	os.remove(imagePath)
-	
+
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 

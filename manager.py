@@ -12,7 +12,7 @@ class Manager:
 		p = re.compile("(?<!_)_(\d+)(_(.+))?")
 		m = p.search(chapterName)
 		return m.group(1).zfill(3), m.group(3)
-	
+
 	def __init__(self, chapDir="."):
 		previousDir = Path.cwd()
 		os.chdir(chapDir)
@@ -20,9 +20,9 @@ class Manager:
 		self.chapNum, self.chapTitle = self.getChapterNumber(Path.cwd().name)
 		os.chdir(str(previousDir))
 
-	def getPageName(self, pageNum, extention):
+	def getPageName(self, pageNum):
 		pageNum = str(pageNum).zfill(2)
-		return self.seriesName + "_c" + self.chapNum + "_p" + pageNum + "." + extention
+		return self.seriesName + "_c" + self.chapNum + "_p" + pageNum
 
 	def getChapterName(self):
 		return self.seriesName + "_c" + self.chapNum
@@ -31,4 +31,4 @@ class Manager:
 		p = re.compile(constants.INDEXED_FILENAME_PATTERN)
 		m = p.search(basename(path))
 		return m.group(1)
-		
+

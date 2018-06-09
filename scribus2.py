@@ -24,13 +24,14 @@ args, unknown = parser.parse_known_args()
 sys.argv.append("-s")
 sys.argv.append("pdf2.py")
 
+print(str(args) + " 7777777777777777777777777777777777777")
 pagesArgs = ""
 if args.p:
-    pagesArgs = "p:" + ",".join(args.p)
-    pagesArgs = constants.zfillParamString(pagesArgs, 2)
-
-if args.p:
+	pagesArgs = "p:" + ",".join(args.p)
+	pagesArgs = constants.zfillParamString(pagesArgs, 2)
 	sys.argv.append("-a")
 	sys.argv.append(pagesArgs)
+	print("scribus2 received -p: " + pagesArgs)
+	print(sys.argv)
 
 import scribus3
