@@ -37,13 +37,12 @@ def findAndProduce(fileIndex):
 		produceFile(f[0])
 
 def produceList(listRanges):
-	for s in listRanges:
-		if "-" not in s:
-			findAndProduce(s)
-		elif not s.startswith("-") :
-			split = s.split("-")
-			for i in range(int(split[0]), int(split[1])+1):
-				findAndProduce(str(i))
+	if "-" not in s:
+		findAndProduce(s)
+	elif not s.startswith("-") :
+		split = s.split("-")
+		for i in range(int(split[0]), int(split[1])+1):
+			findAndProduce(str(i))
 
 os.makedirs("../jpg/", exist_ok=True)
 os.makedirs("../png/", exist_ok=True)
@@ -52,16 +51,12 @@ magick = "" if os.name != "nt" else "magick "
 #Batch <= because no specific file indicated
 args.p = args.p if args.p else sys.argv[1:]
 if args.p:
-	print("1111111111111")
-	print(args.p)
-	for s in args.p : produceList(s)
+	for s in args.p :
+		produceList(s)
 else :
 	for f in sorted(glob.glob("./*[0-9].kra")):
 		print(f)
 		produceFile(f)
-
-
-
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
 

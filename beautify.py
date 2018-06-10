@@ -35,11 +35,24 @@ def rename(swapNamePrefix="beautiful_", globExpr = "*"):
 def swapExtention(old: str, new: str, items: list):
 	return [re.sub("\." + old + "$", "." + new, item) for item in items]
 
-def swapXml(xml, targets, prefix):
+def swapXml(xml, prefix):
+	targets = []
+	print(manager.getChapterName())
+	for match in re.findall("(\W)" + "(\w+" + "_p\d+)", xml):
+		print(str(match))
+		print("found " + match[1])
+
+		targets.append(match[1])
+	targets = sorted(targets)
+	print("targets -----------------------------")
+	for target in targets:
+		print(target)
+	print("targets -----------------------------")
+
 	index = 1
-	for adress in targets:
-		print("replacing: " + splitext(adress)[0] + " by: " + prefix + manager.getPageName(index))
-		xml = re.sub("(\W)" + splitext(adress)[0], lambda x:x.group(1) + prefix + manager.getPageName(index),xml)
+	for target in targets:
+		print("replacing: " + target + " by: " + prefix + manager.getPageName(index))
+		xml = re.sub("(\W)" + target, lambda x: x.group(1) + prefix + manager.getPageName(index), xml, 1)
 		index += 1
 	return xml
 
@@ -62,17 +75,24 @@ def beautify(globs):
 
 		os.chdir("../scribus")
 		for sla in glob.glob("*.sla"):
+			i = 1
+			while os.path.isfile(sla + str(i).zfill(2)):
+				i+=1
+			if not os.path.exists("back"):
+				os.makedirs("back")
+			shutil.copyfile(sla, "back/" + splitext(sla)[0] + "_" + str(i) + splitext(sla)[1])
 			file = open(sla, "r")
 			xml = file.read()
 			file.close()
 
-			xml = swapXml(xml, before, "beautiful_")
+			xml = swapXml(xml, "beautiful_")
 			os.chdir("../kra")
-			xml = swapXml(xml, sorted("beautiful_" + splitext(beautiful)[0] for beautiful in glob.glob("*.kra")),  "")
+			xml = swapXml(xml, "")
 			os.chdir("../scribus")
-			file = open(sla,"w")
+			file = open(sla, "w")
 			file.write(xml)
 			file.close()
+
 
 # ####################################################################################
 if args.g:
