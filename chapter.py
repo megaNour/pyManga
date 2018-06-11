@@ -18,10 +18,10 @@ args, unknown = parser.parse_known_args()
 #sys.argv[1] = "coucou"
 #print(sys.argv[1])
 #print(len(sys.argv))
-	
+
 chapNum = 1
 chapter = "chapitre_"
-p = re.compile("(?<!_)_(\d+)(_.+)?")
+p = re.compile(chapter + "(\d+)(_.+)?")
 for s in os.listdir():
 	m = p.search(s)
 	if m:
@@ -58,4 +58,4 @@ writeFile.write(content)
 writeFile.close()
 
 #print(content)
-#shutil.copyfile("./generic/scribus/generic.sla", "./" + chapterName + "/scribus/" + chapterName + ".sla")   
+#shutil.copyfile("./generic/scribus/generic.sla", "./" + chapterName + "/scribus/" + chapterName + ".sla")
