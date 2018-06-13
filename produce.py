@@ -41,7 +41,8 @@ def produceList(listRanges):
 		findAndProduce(s)
 	elif not s.startswith("-") :
 		split = s.split("-")
-		for i in range(int(split[0]), int(split[1])+1):
+		max = int(split[1]) if split[1] != "end" else len(glob.glob("*.kra"))
+		for i in range(int(split[0]), max + 1):
 			findAndProduce(str(i))
 
 os.makedirs("../jpg/", exist_ok=True)
