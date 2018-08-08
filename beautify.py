@@ -38,7 +38,7 @@ def swapExtention(old: str, new: str, items: list):
 def swapXml(xml, prefix):
 	targets = []
 	print(manager.getChapterName())
-	for match in re.findall("(\W)" + "(\w+" + "_p\d+)", xml):
+	for match in re.findall("(\W)" + "(\w+" + "_p[\d_-]+)", xml):
 		print(str(match))
 		print("found " + match[1])
 

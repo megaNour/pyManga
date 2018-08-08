@@ -32,8 +32,8 @@ manager = Manager("..")
 scrollSuffix = "_scroll.jpg"
 magick = "" if os.name != "nt" else "magick "
 append = " " if not args.f else " -append "
-
-command = magick + "convert -colorspace sRGB -append "
+convert = "convert -set colorspace sRGB"
+command = magick + convert + " -append "
 
 def findWidestRange(listString):
 	flat = " ".join(listString)
@@ -71,7 +71,7 @@ def makeScrolls(targets, extraPath=""):
 			auxCommand = command
 			print("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
 			for panel in rangeStr:
-				export = magick + "convert" + append + panel + foot + "../panels/" + panel
+				export = magick + convert + append + panel + foot + "../panels/" + panel
 				if int(manager.getPageNumber(panel)) == 1: export = export.replace(foot, " ")
 				printAndRun(export)
 				auxCommand += " " + basename(panel) + marge
@@ -127,7 +127,7 @@ for pdf in targets:
 	match = constants.getIndexStart(fileName)
 	index = "1" if match is None else str(match.group(1))
 
-	printAndRun(magick + "convert -density 300 -scene " + index + " -resize " + str(width) + " "
+	printAndRun(magick + convert + " -density 300 -scene " + index + " -resize " + str(width) + " "
 	+ pdf + " ../release/" + manager.getChapterName() + "_p%02d.png")
 
 	if not args.D:
@@ -153,7 +153,7 @@ doMagick()
 os.chdir("../panels")
 
 for imagePath in glob.glob("*.png"):
-	printAndRun(magick + "convert -crop 800x1200 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
+	printAndRun(magick + convert + " -crop 800x1280 -scene 1 " +  imagePath + " " + imagePath.split(".")[0] + ".jpg")
 	os.remove(imagePath)
 
 print("time taken: {:.2f}s {}".format((time.time() - start), os.path.basename(__file__)))
