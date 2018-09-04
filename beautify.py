@@ -61,7 +61,7 @@ def beautify(globs):
 	for globExpr in globs:
 		before = rename(globExpr=globExpr)
 		rename("", globExpr)
-
+"""
 	if "*.kra" in globs:
 		after = sorted(glob.glob("*.kra"))
 		#if before != after and len(after) > 0:
@@ -92,7 +92,7 @@ def beautify(globs):
 			file = open(sla, "w")
 			file.write(xml)
 			file.close()
-
+"""
 
 # ####################################################################################
 if args.g:
